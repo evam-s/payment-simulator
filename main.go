@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"payment-simulator/internal/config"
 	"payment-simulator/internal/db"
 	"payment-simulator/internal/filestore"
 )
@@ -22,8 +23,9 @@ type Transaction struct {
 }
 
 func main() {
-	fmt.Println("Payments Simulator starting...")
-	db.ConnectMongo("mongodb://localhost:27017")
+	config := config.LoadConfig()
+	fmt.Println("Starting App in ", config.ServiceMode, " Mode...")
+	db.ConnectMongo(config.DBTECH + "://" + config.DBURL + ":" + config.DBPORT)
 	router := gin.Default()
 	router.GET("/health", func(c *gin.Context) {
 		c.JSON(200, gin.H{"status": "ok"})
@@ -60,7 +62,8 @@ func main() {
 
 		c.JSON(200, gin.H{"message": "Transaction Rcvd", "transaction": tx})
 	})
-	router.Run(":8080")
+	fmt.Println("Payments App Started on Port: ", config.ServicePort)
+	router.Run(":" + config.ServicePort)
 }
 
 func ensureDir(path string) error {
