@@ -3,19 +3,27 @@ package main
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"log"
+	"math/rand"
 	"net/http"
+	"os"
+	"path/filepath"
+	"payment-simulator/internal/db"
+	"payment-simulator/internal/filestore"
 )
 
 type Transaction struct {
-	Sender string  `json:"payer"`
-	Rcvr   string  `json:"payee"`
-	Amount float64 `json:"amount"`
-	Status string  `json:"status"`
-	payer2 string
+	Sender     string  `xml:"Payer"`
+	SenderAcct string  `xml:"PayerAcct"`
+	Rcvr       string  `xml:"Payee"`
+	RcvrAcct   string  `xml:"PayeeAcct"`
+	Amount     float64 `xml:"Amount"`
+	Status     string  `xml:"Status"`
 }
 
 func main() {
 	fmt.Println("Payments Simulator starting...")
+	db.ConnectMongo("mongodb://localhost:27017")
 	router := gin.Default()
 	router.GET("/health", func(c *gin.Context) {
 		c.JSON(200, gin.H{"status": "ok"})
@@ -27,18 +35,35 @@ func main() {
 	router.POST("/transaction", func(c *gin.Context) {
 		fmt.Println("Payment Order Rcvd. Context: ", c)
 		var tx Transaction
-		if err := c.ShouldBindJSON(&tx); err != nil {
-			fmt.Println("ERRRRRRRRRRRRRRRRRRRRR: ", tx)
+		if err := c.ShouldBindXML(&tx); err != nil {
+			fmt.Println("Error in Binding to XML for Transaction: ", tx)
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
-		tx.Status = "wait wat?"
-		tx.payer2 = "asdfzxcv "
 		fmt.Println("Payee: ", tx.Rcvr)
 		fmt.Println("Payer: ", tx.Sender)
 		fmt.Println("Amount: ", tx.Amount)
-		fmt.Println("payer2: ", tx.payer2)
+
+		store := filestore.NewFileStore("bucket/data.json")
+		if err := ensureDir("bucket/data.json"); err != nil {
+			log.Fatalf("Failed to create directory: %v", err)
+		}
+		txnId := (tx.Sender + "_" + tx.Rcvr + "_" + fmt.Sprint(rand.Intn(500)))
+		tx.Status = "Payment Rcvd!, Id:" + txnId
+		payments := []filestore.Payment{{Id: txnId, Amount: tx.Amount}}
+		log.Printf("payments = %+v", payments)
+		if err := store.Save(payments); err != nil {
+			log.Printf("Save error: %v", err)
+		}
+		loaded, _ := store.Load()
+		fmt.Println("\nMost Recent payment:", loaded[0])
+
 		c.JSON(200, gin.H{"message": "Transaction Rcvd", "transaction": tx})
 	})
 	router.Run(":8080")
+}
+
+func ensureDir(path string) error {
+	dir := filepath.Dir(path)
+	return os.MkdirAll(dir, os.ModePerm)
 }
