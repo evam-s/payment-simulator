@@ -10,11 +10,11 @@ import (
 
 var DB *mongo.Database
 
-func ConnectMongo(uri string) {
+func ConnectMongo(url, DBName string) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
-
-	client, err := mongo.Connect(ctx, options.Client().ApplyURI(uri))
+	// Example: mongodb://appUser:AppPassword456@localhost:27017/yourdbname?authSource=yourdbname
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI(url))
 	if err != nil {
 		log.Fatalf("Failed to connect to Mongo: %v", err)
 	}
@@ -25,5 +25,5 @@ func ConnectMongo(uri string) {
 	}
 
 	log.Println("Connected to MongoDB!")
-	DB = client.Database("paymentsim") // choose your DB name
+	DB = client.Database(DBName) // choose your DB name
 }

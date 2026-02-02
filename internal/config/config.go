@@ -12,20 +12,34 @@ type Config struct {
 	DBPORT      string
 	DBTECH      string
 	DBURL       string
+	DBUSER      string
+	DBPASS      string
 	LogLevel    string
+	CacheTECH   string
+	CacheURL    string
+	CachePORT   string
+	CacheUSER   string
+	CachePASS   string
 }
 
-func LoadConfig() *Config {
+func LoadConfig() Config {
 	log.Println("Loading configuration...")
 
-	cfg := &Config{
+	cfg := Config{
+		ServiceMode: getEnv("SERVICE_MODE", "development"),
 		ServicePort: getEnv("SERVICE_PORT", "8080"),
 		DBNAME:      getEnv("DB_NAME", "paymentsim"),
 		DBPORT:      getEnv("DB_PORT", "27017"),
 		DBTECH:      getEnv("DB_TECH", "mongodb"),
 		DBURL:       getEnv("DB_URL", "localhost"),
+		DBUSER:      getEnv("DB_USER", "paymentsimuser"),
+		DBPASS:      getEnv("DB_PASS", "paymentsimuser"),
 		LogLevel:    getEnv("LOG_LEVEL", "info"),
-		ServiceMode: getEnv("SERVICE_MODE", "development"),
+		CacheTECH:   getEnv("CACHE_TECH", "redis"),
+		CacheURL:    getEnv("CACHE_URL", "localhost"),
+		CachePORT:   getEnv("CACHE_PORT", "6379"),
+		CacheUSER:   getEnv("CACHE_USER", "admin"),
+		CachePASS:   getEnv("CACHE_PASS", "admin"),
 	}
 
 	log.Println("Configuration loaded:", cfg)
