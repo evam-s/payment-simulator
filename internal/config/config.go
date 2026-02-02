@@ -22,10 +22,11 @@ type Config struct {
 	CachePASS   string
 }
 
-func LoadConfig() Config {
-	log.Println("Loading configuration...")
+var cfg Config
 
-	cfg := Config{
+func init() {
+	log.Println("Initializing configuration...")
+	cfg = Config{
 		ServiceMode: getEnv("SERVICE_MODE", "development"),
 		ServicePort: getEnv("SERVICE_PORT", "8080"),
 		DBNAME:      getEnv("DB_NAME", "paymentsim"),
@@ -41,9 +42,10 @@ func LoadConfig() Config {
 		CacheUSER:   getEnv("CACHE_USER", "admin"),
 		CachePASS:   getEnv("CACHE_PASS", "admin"),
 	}
+}
 
+func LoadConfig() Config {
 	log.Println("Configuration loaded:", cfg)
-
 	return cfg
 }
 

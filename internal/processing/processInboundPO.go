@@ -2,14 +2,21 @@ package processing
 
 import (
 	"encoding/json"
-	"fmt"
-	// "payment-simulator/internal/cache"
+	"log"
 	"payment-simulator/internal/models"
 )
 
 func ProcessInboundPo(po *models.PaymentOrder) {
 	jsonData, _ := json.MarshalIndent(&po, "", " ")
-	fmt.Println("Payment Order Rcvd: ", string(jsonData))
+	log.Println("Payment Order Rcvd: ", string(jsonData))
 	po.PoNumber = AssignPoNumber()
-	po.Status = "ACCC"
+	if res, err := DuplicateCheck(po); res {
+		po.Errors = append(po.Errors, err.Error())
+		po.Status = "RJCT"
+	} else {
+		if err != nil {
+			log.Printf("There was some error in Checking if PO %s is Duplicate: ", po.PoNumber)
+		}
+		po.Status = "ACTC"
+	}
 }

@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	nanoid "github.com/matoous/go-nanoid/v2"
+	"go.mongodb.org/mongo-driver/bson"
 	"io"
 	"log"
 	"net/http"
@@ -33,12 +34,13 @@ func RoutingSetup() *gin.Engine {
 		c.Request.Body = io.NopCloser(bytes.NewBuffer(bodyBytes))
 
 		id, _ := nanoid.New(12)
-		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		contextBg := context.Background()
+		ctx, cancel := context.WithTimeout(contextBg, 5*time.Second)
 		defer cancel()
 
-		if res, err := db.DB.Collection("transactionInput").InsertOne(ctx, map[string]any{
+		if res, err := db.DB.Collection("MessageLogger").InsertOne(ctx, map[string]any{
 			"_id":         id,
-			"raw_payload": string(bodyBytes),
+			"asIsMsg":     string(bodyBytes),
 			"received_at": time.Now(),
 		}); err != nil {
 			log.Printf("Failed to log raw payload: %v\n", err)
@@ -47,10 +49,19 @@ func RoutingSetup() *gin.Engine {
 		}
 
 		if po, err := mapping.MapIsoPacs008ToPo(c); err != nil {
+			ctx1, cancel1 := context.WithTimeout(contextBg, 5*time.Second)
+			defer cancel1()
+			update := bson.M{"$set": bson.M{"error": err.Error()}}
+			db.DB.Collection("MessageLogger").UpdateByID(ctx1, id, update)
+
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		} else {
 			processing.ProcessInboundPo(po)
-			log.Println("Process Inbound Payment Order: ", *po)
+			ctx1, cancel1 := context.WithTimeout(contextBg, 5*time.Second)
+			defer cancel1()
+			update := bson.M{"$set": po}
+			db.DB.Collection("MessageLogger").UpdateByID(ctx1, id, update)
+			log.Println("Processed Inbound Payment Order: ", *po)
 			c.JSON(200, gin.H{"PO": *po})
 		}
 	})
