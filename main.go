@@ -8,6 +8,7 @@ import (
 	"payment-simulator/internal/config"
 	"payment-simulator/internal/db"
 	"payment-simulator/internal/routing"
+	"payment-simulator/internal/validation"
 )
 
 func main() {
@@ -22,6 +23,7 @@ func main() {
 		cache.ConnectRedis(""+config.CacheURL+":"+config.CachePORT, config.CacheUSER, config.CachePASS)
 	}
 	router := routing.RoutingSetup()
+	validation.RegisterCustomValidations()
 
 	fmt.Println("Payments App Started on Port: ", config.ServicePort)
 	router.Run(":" + config.ServicePort)

@@ -3,17 +3,20 @@ package routing
 import (
 	"bytes"
 	"context"
+	// "encoding/json"
 	"fmt"
-	"github.com/gin-gonic/gin"
-	nanoid "github.com/matoous/go-nanoid/v2"
-	"go.mongodb.org/mongo-driver/bson"
 	"io"
 	"log"
 	"net/http"
 	"payment-simulator/internal/db"
+	// "payment-simulator/internal/iso20022/isomodels"
+	"github.com/gin-gonic/gin"
+	nanoid "github.com/matoous/go-nanoid/v2"
+	"go.mongodb.org/mongo-driver/bson"
 	"payment-simulator/internal/mapping"
 	"payment-simulator/internal/processing"
 	"time"
+	// "go.mongodb.org/mongo-driver/mongo/options"
 )
 
 func RoutingSetup() *gin.Engine {
@@ -48,7 +51,7 @@ func RoutingSetup() *gin.Engine {
 			log.Println("Logged Transaction Input, Id: ", res.InsertedID)
 		}
 
-		if po, err := mapping.MapIsoPacs008ToPo(c); err != nil {
+		if isoPacs, err := mapping.MapXmlPacs008(c); err != nil {
 			ctx1, cancel1 := context.WithTimeout(contextBg, 5*time.Second)
 			defer cancel1()
 			update := bson.M{"$set": bson.M{"error": err.Error()}}
@@ -56,13 +59,38 @@ func RoutingSetup() *gin.Engine {
 
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		} else {
-			processing.ProcessInboundPo(po)
 			ctx1, cancel1 := context.WithTimeout(contextBg, 5*time.Second)
 			defer cancel1()
-			update := bson.M{"$set": po}
+
+			// log.Println("isoPacs", isoPacs)
+			update := bson.M{"$set": bson.M{"transformedXml": isoPacs}}
 			db.DB.Collection("MessageLogger").UpdateByID(ctx1, id, update)
-			log.Println("Processed Inbound Payment Order: ", *po)
-			c.JSON(200, gin.H{"PO": *po})
+
+			if err := processing.ProcessInboundPo(isoPacs); err != nil {
+				c.JSON(400, gin.H{"ErrorMessage": err})
+			} else {
+				c.JSON(200, gin.H{"PO": *isoPacs})
+			}
+			// opts := options.FindOne().
+			// 	SetSort(bson.D{{Key: "received_at", Value: -1}}).
+			// 	SetProjection(bson.M{"transformedXml": 1})
+
+			// var wrapper struct {
+			// 	TransformedXml isomodels.Pacs008 `bson:"transformedXml"`
+			// }
+			// err := db.DB.Collection("MessageLogger").
+			// 	FindOne(contextBg, bson.M{}, opts).
+			// 	Decode(&wrapper)
+
+			// log.Println("err:", err)
+			// by, _ := json.MarshalIndent(&wrapper, "", "  ")
+			// log.Println("result:", string(by))
+
+			// ctx1, cancel1 := context.WithTimeout(contextBg, 5*time.Second)
+			// defer cancel1()
+			// update := bson.M{"$set": po}
+			// db.DB.Collection("MessageLogger").UpdateByID(ctx1, id, update)
+			// log.Println("Processed Inbound Payment Order: ", *po)
 		}
 	})
 	return router
