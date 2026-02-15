@@ -33,14 +33,14 @@ type Party struct {
 	Name                     string          `json:"name,omitempty"`
 	PostalAddress            PstlAdr         `json:"postalAddress,omitzero"`
 	OrgIdAnyBic              string          `json:"orgIdAnyBic,omitempty"`
-	OrgIdLei                 string          `json:"orgIdLei,omitempty" binding:"regexp=^[A-Z0-9]{18}[0-9]{2}$"`
+	OrgIdLei                 string          `json:"orgIdLei,omitempty"`
 	OrgIdOther               []OrgIdOthr     `json:"orgIdOther,omitzero"`
 	PrivateIdBirthDate       string          `json:"birthDate,omitempty"`
 	PrivateIdProvinceOfBirth string          `json:"provinceOfBirth,omitempty"`
 	PrivateIdCityOfBirth     string          `json:"cityOfBirth,omitempty"`
-	PrivateIdCountryOfBirth  string          `json:"countryOfBirth,omitempty" binding:"regexp=^[A-Z]{2}$"`
+	PrivateIdCountryOfBirth  string          `json:"countryOfBirth,omitempty"`
 	PrivateIdOther           []PrivateIdOthr `json:"other,omitzero"`
-	CountryOfResidence       string          `json:"countryOfResidence,omitempty" binding:"regexp=^[A-Z]{2}$"`
+	CountryOfResidence       string          `json:"countryOfResidence,omitempty"`
 	ContactDetails           CtctDtls        `json:"contactDetails,omitzero"`
 }
 
@@ -49,47 +49,47 @@ type PstlAdr struct {
 	AddressTypeProprietaryId         string `json:"addressTypeProprietaryId,omitempty"`
 	AddressTypeProprietaryIssuer     string `json:"addressTypeProprietaryIssuer,omitempty"`
 	AddressTypeProprietarySchemeName string `json:"addressTypeProprietarySchemeName,omitempty"`
-	CareOf                           string `json:"careOf,omitempty" binding:"max=140"`
-	Department                       string `json:"department,omitempty" binding:"max=70"`
-	SubDepartment                    string `json:"subDepartment,omitempty" binding:"max=70"`
-	StreetName                       string `json:"streetName,omitempty" binding:"max=140"`
-	BuildingNumber                   string `json:"buildingNumber,omitempty" binding:"max=16"`
-	BuildingName                     string `json:"buildingName,omitempty" binding:"max=140"`
-	Floor                            string `json:"floor,omitempty" binding:"max=70"`
-	UnitNumber                       string `json:"unitNumber,omitempty" binding:"max=16"`
-	PostBox                          string `json:"postBox,omitempty" binding:"max=16"`
-	Room                             string `json:"room,omitempty" binding:"max=70"`
-	PostalCode                       string `json:"postalCode,omitempty" binding:"max=16"`
-	TownName                         string `json:"townName,omitempty" binding:"max=140"`
-	TownLocationName                 string `json:"townLocationName,omitempty" binding:"max=140"`
-	DistrictName                     string `json:"districtName,omitempty" binding:"max=140"`
-	CountrySubdivision               string `json:"countrySubdivision,omitempty" binding:"max=35"`
-	Country                          string `json:"country,omitempty" binding:"regexp=^[A-Z]{2}$"`
-	AddressLine                      string `json:"addressLine,omitempty" binding:"max=70"`
+	CareOf                           string `json:"careOf,omitempty"`
+	Department                       string `json:"department,omitempty"`
+	SubDepartment                    string `json:"subDepartment,omitempty"`
+	StreetName                       string `json:"streetName,omitempty"`
+	BuildingNumber                   string `json:"buildingNumber,omitempty"`
+	BuildingName                     string `json:"buildingName,omitempty"`
+	Floor                            string `json:"floor,omitempty"`
+	UnitNumber                       string `json:"unitNumber,omitempty"`
+	PostBox                          string `json:"postBox,omitempty"`
+	Room                             string `json:"room,omitempty"`
+	PostalCode                       string `json:"postalCode,omitempty"`
+	TownName                         string `json:"townName,omitempty"`
+	TownLocationName                 string `json:"townLocationName,omitempty"`
+	DistrictName                     string `json:"districtName,omitempty"`
+	CountrySubdivision               string `json:"countrySubdivision,omitempty"`
+	Country                          string `json:"country,omitempty"`
+	AddressLine                      string `json:"addressLine,omitempty"`
 }
 
 type OrgIdOthr struct {
 	Id                    string `json:"id,omitempty"`
 	Issuer                string `json:"issuer,omitempty"`
 	SchemeNameCode        string `json:"schemeNameCode,omitempty"`
-	SchemeNameProprietary string `json:"schemeNameProprietary,omitempty" binding:"max=35"`
+	SchemeNameProprietary string `json:"schemeNameProprietary,omitempty"`
 }
 
 type PrivateIdOthr struct {
 	Id                    string `json:"id,omitempty"`
 	Issuer                string `json:"issuer,omitempty"`
 	SchemeNameCode        string `json:"schemeNameCode,omitempty"`
-	SchemeNameProprietary string `json:"schemeNameProprietary,omitempty" binding:"max=35"`
+	SchemeNameProprietary string `json:"schemeNameProprietary,omitempty"`
 }
 
 type CtctDtls struct {
 	NamePrefix      string        `json:"namePrefix,omitempty"`
 	Name            string        `json:"name,omitempty"`
-	PhoneNumber     string        `json:"phoneNumber,omitempty" binding:"regexp=^\\+[0-9]{1,3}-[0-9()+\\-]{1,30}$"`
-	MobileNumber    string        `json:"mobileNumber,omitempty" binding:"regexp=^\\+[0-9]{1,3}-[0-9()+\\-]{1,30}$"`
-	FaxNumber       string        `json:"faxNumber,omitempty" binding:"regexp=^\\+[0-9]{1,3}-[0-9()+\\-]{1,30}$"`
+	PhoneNumber     string        `json:"phoneNumber,omitempty"`
+	MobileNumber    string        `json:"mobileNumber,omitempty"`
+	FaxNumber       string        `json:"faxNumber,omitempty"`
 	UrlAddress      string        `json:"urlAddress,omitempty"`
-	EmailAddress    string        `json:"emailAddress,omitempty" binding:"email"`
+	EmailAddress    string        `json:"emailAddress,omitempty"`
 	EmailPurpose    string        `json:"emailPurpose,omitempty"`
 	JobTitle        string        `json:"jobTitle,omitempty"`
 	Responsibility  string        `json:"responsibility,omitempty"`
@@ -111,47 +111,47 @@ type Account struct {
 	OtherSchemeNameProprietary string `json:"otherSchemeNameProprietary,omitempty"`
 	TypeCode                   string `json:"typeCode,omitempty"`
 	TypeProprietary            string `json:"typeProprietary,omitempty"`
-	Currency                   string `json:"currency,omitempty" binding:"regexp=^[A-Z]{3}$"`
+	Currency                   string `json:"currency,omitempty"`
 	Name                       string `json:"name,omitempty"`
 	ProxyId                    string `json:"proxyId,omitempty"`
 	ProxyType                  string `json:"proxyType,omitempty"`
 }
 
 type Agent struct {
-	FinancialInstitutionId FinInstnId `json:"financialInstitutionId" binding:"required"`
+	FinancialInstitutionId FinInstnId `json:"financialInstitutionId"`
 	BranchId               BrnchId    `json:"branchId,omitzero"`
 }
 
 type FinInstnId struct {
-	Bicfi                       string  `json:"bicfi,omitempty" binding:"regexp=^[A-Z0-9]{4}[A-Z]{2}[A-Z0-9]{2}([A-Z0-9]{3})?$"`
-	ClearingSystemIdCode        string  `json:"clearingSystemIdCode,omitzero" binding:"min=1,max=5"`
-	ClearingSystemIdProprietary string  `json:"clearingSystemIdProprietary,omitzero" binding:"max=35"`
-	MemberId                    string  `json:"memberId,omitempty" binding:"max=35"`
-	Lei                         string  `json:"lei,omitempty" binding:"regexp=^[A-Z0-9]{18}[0-9]{2}$"`
-	Name                        string  `json:"name,omitempty" binding:"max=140"`
+	Bicfi                       string  `json:"bicfi,omitempty"`
+	ClearingSystemIdCode        string  `json:"clearingSystemIdCode,omitzero"`
+	ClearingSystemIdProprietary string  `json:"clearingSystemIdProprietary,omitzero"`
+	MemberId                    string  `json:"memberId,omitempty"`
+	Lei                         string  `json:"lei,omitempty"`
+	Name                        string  `json:"name,omitempty"`
 	PostalAddress               PstlAdr `json:"postalAddress,omitzero"`
-	OtherId                     string  `json:"otherId,omitempty" binding:"max=35"`
-	OtherIssuer                 string  `json:"otherIssuer,omitempty" binding:"max=35"`
-	OtherSchemeNameCode         string  `json:"otherSchemeNameCode,omitzero" binding:"min=1,max=4"`
-	OtherSchemeNameProprietary  string  `json:"otherSchemeNameProprietary,omitzero" binding:"max=35"`
+	OtherId                     string  `json:"otherId,omitempty"`
+	OtherIssuer                 string  `json:"otherIssuer,omitempty"`
+	OtherSchemeNameCode         string  `json:"otherSchemeNameCode,omitzero"`
+	OtherSchemeNameProprietary  string  `json:"otherSchemeNameProprietary,omitzero"`
 }
 
 type BrnchId struct {
-	Id            string  `json:"id,omitempty" binding:"max=35"`
-	Lei           string  `json:"lei,omitempty" binding:"regexp=^[A-Z0-9]{18}[0-9]{2}$"`
-	Name          string  `json:"name,omitempty" binding:"max=140"`
+	Id            string  `json:"id,omitempty"`
+	Lei           string  `json:"lei,omitempty"`
+	Name          string  `json:"name,omitempty"`
 	PostalAddress PstlAdr `json:"postalAddress,omitzero"`
 }
 
 type Charges struct {
-	Amount Amount  `json:"amount,omitzero" binding:"required"`
-	Agent  Agent   `json:"agent,omitzero" binding:"required"`
+	Amount Amount  `json:"amount,omitzero"`
+	Agent  Agent   `json:"agent,omitzero"`
 	Type   ChrgsTp `json:"type,omitzero"`
 }
 
 type Amount struct {
-	Value    float64 `json:"value" binding:"required"`
-	Currency string  `json:"currency" binding:"required,regexp=^[A-Z]{3}$"`
+	Value    float64 `json:"value"`
+	Currency string  `json:"currency"`
 }
 
 type ChrgsTp struct {
