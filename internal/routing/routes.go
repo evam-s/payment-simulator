@@ -34,6 +34,7 @@ func RoutingSetup() *gin.Engine {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to read request body"})
 			return
 		}
+		log.Println("Request Headers:", c.Request.Header)
 		c.Request.Body = io.NopCloser(bytes.NewBuffer(bodyBytes))
 
 		id, _ := nanoid.New(12)
@@ -71,26 +72,6 @@ func RoutingSetup() *gin.Engine {
 			} else {
 				c.JSON(200, gin.H{"PO": *isoPacs})
 			}
-			// opts := options.FindOne().
-			// 	SetSort(bson.D{{Key: "received_at", Value: -1}}).
-			// 	SetProjection(bson.M{"transformedXml": 1})
-
-			// var wrapper struct {
-			// 	TransformedXml isomodels.Pacs008 `bson:"transformedXml"`
-			// }
-			// err := db.DB.Collection("MessageLogger").
-			// 	FindOne(contextBg, bson.M{}, opts).
-			// 	Decode(&wrapper)
-
-			// log.Println("err:", err)
-			// by, _ := json.MarshalIndent(&wrapper, "", "  ")
-			// log.Println("result:", string(by))
-
-			// ctx1, cancel1 := context.WithTimeout(contextBg, 5*time.Second)
-			// defer cancel1()
-			// update := bson.M{"$set": po}
-			// db.DB.Collection("MessageLogger").UpdateByID(ctx1, id, update)
-			// log.Println("Processed Inbound Payment Order: ", *po)
 		}
 	})
 	return router

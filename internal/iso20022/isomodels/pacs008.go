@@ -5,12 +5,12 @@ type Pacs008 struct {
 }
 
 type FIToFICstmrCdtTrf struct {
-	GrpHdr      GrpHdr        `xml:"GrpHdr" json:"groupHeader" binding:"required"`
+	GrpHdr      GrpHdrPacs008 `xml:"GrpHdr" json:"groupHeader" binding:"required"`
 	CdtTrfTxInf []CdtTrfTxInf `xml:"CdtTrfTxInf" json:"creditTransferTransaction" binding:"required,min=1,dive"`
 	SplmtryData []SplmtryData `xml:"SplmtryData" json:"supplementaryData"`
 }
 
-type GrpHdr struct {
+type GrpHdrPacs008 struct {
 	MsgId             string   `xml:"MsgId" json:"messageId" binding:"required,max=35"`
 	CreDtTm           string   `xml:"CreDtTm" json:"creationDateTime" binding:"required"`
 	NbOfTxs           string   `xml:"NbOfTxs" json:"numberOfTxs" binding:"required,numeric,omitempty,min=1,max=15"`
@@ -371,8 +371,8 @@ type AccountId struct {
 }
 
 type AccountOthr struct {
-	Id      string         `xml:"Id,omitempty" json:"id,omitempty" binding:"required,max=34"`
-	Issr    string         `xml:"Issr,omitempty" json:"issuer,omitempty" binding:"max=35"`
+	Id      string          `xml:"Id,omitempty" json:"id,omitempty" binding:"required,max=34"`
+	Issr    string          `xml:"Issr,omitempty" json:"issuer,omitempty" binding:"max=35"`
 	SchmeNm *AccountSchmeNm `xml:"SchmeNm,omitempty" json:"schemeName,omitzero"`
 }
 

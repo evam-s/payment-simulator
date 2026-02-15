@@ -31,7 +31,7 @@ type PaymentOrder struct {
 
 type Party struct {
 	Name                     string          `json:"name,omitempty"`
-	PostalAddress            PstlAdr         `json:"postalAddress,omitzero"`
+	PostalAddress            PostalAddress   `json:"postalAddress,omitzero"`
 	OrgIdAnyBic              string          `json:"orgIdAnyBic,omitempty"`
 	OrgIdLei                 string          `json:"orgIdLei,omitempty"`
 	OrgIdOther               []OrgIdOthr     `json:"orgIdOther,omitzero"`
@@ -41,10 +41,10 @@ type Party struct {
 	PrivateIdCountryOfBirth  string          `json:"countryOfBirth,omitempty"`
 	PrivateIdOther           []PrivateIdOthr `json:"other,omitzero"`
 	CountryOfResidence       string          `json:"countryOfResidence,omitempty"`
-	ContactDetails           CtctDtls        `json:"contactDetails,omitzero"`
+	ContactDetails           ContactDetails  `json:"contactDetails,omitzero"`
 }
 
-type PstlAdr struct {
+type PostalAddress struct {
 	AddressTypeCode                  string `json:"addressTypeCode,omitempty"`
 	AddressTypeProprietaryId         string `json:"addressTypeProprietaryId,omitempty"`
 	AddressTypeProprietaryIssuer     string `json:"addressTypeProprietaryIssuer,omitempty"`
@@ -82,7 +82,7 @@ type PrivateIdOthr struct {
 	SchemeNameProprietary string `json:"schemeNameProprietary,omitempty"`
 }
 
-type CtctDtls struct {
+type ContactDetails struct {
 	NamePrefix      string        `json:"namePrefix,omitempty"`
 	Name            string        `json:"name,omitempty"`
 	PhoneNumber     string        `json:"phoneNumber,omitempty"`
@@ -94,8 +94,8 @@ type CtctDtls struct {
 	JobTitle        string        `json:"jobTitle,omitempty"`
 	Responsibility  string        `json:"responsibility,omitempty"`
 	Department      string        `json:"department,omitempty"`
-	Other           []ContactOthr `json:"other,omitzero"`
 	PreferredMethod string        `json:"preferredMethod,omitempty"`
+	Other           []ContactOthr `json:"other,omitzero"`
 }
 
 type ContactOthr struct {
@@ -118,29 +118,42 @@ type Account struct {
 }
 
 type Agent struct {
-	FinancialInstitutionId FinInstnId `json:"financialInstitutionId"`
-	BranchId               BrnchId    `json:"branchId,omitzero"`
+	FiiBicfi                       string        `json:"fiiBicfi,omitempty"`
+	FiiClearingSystemIdCode        string        `json:"fiiClearingSystemIdCode,omitzero"`
+	FiiClearingSystemIdProprietary string        `json:"fiiClearingSystemIdProprietary,omitzero"`
+	FiiMemberId                    string        `json:"fiiMemberId,omitempty"`
+	FiiLei                         string        `json:"fiiLei,omitempty"`
+	FiiName                        string        `json:"fiiName,omitempty"`
+	FiiPostalAddress               PostalAddress `json:"fiiPostalAddress,omitzero"`
+	FiiOtherId                     string        `json:"fiiOtherId,omitempty"`
+	FiiOtherIssuer                 string        `json:"fiiOtherIssuer,omitempty"`
+	FiiOtherSchemeNameCode         string        `json:"fiiOtherSchemeNameCode,omitzero"`
+	FiiOtherSchemeNameProprietary  string        `json:"fiiOtherSchemeNameProprietary,omitzero"`
+	BiId                           string        `json:"biId,omitempty"`
+	BiLei                          string        `json:"biLei,omitempty"`
+	BiName                         string        `json:"biName,omitempty"`
+	BiPostalAddress                PostalAddress `json:"biPostalAddress,omitzero"`
 }
 
 type FinInstnId struct {
-	Bicfi                       string  `json:"bicfi,omitempty"`
-	ClearingSystemIdCode        string  `json:"clearingSystemIdCode,omitzero"`
-	ClearingSystemIdProprietary string  `json:"clearingSystemIdProprietary,omitzero"`
-	MemberId                    string  `json:"memberId,omitempty"`
-	Lei                         string  `json:"lei,omitempty"`
-	Name                        string  `json:"name,omitempty"`
-	PostalAddress               PstlAdr `json:"postalAddress,omitzero"`
-	OtherId                     string  `json:"otherId,omitempty"`
-	OtherIssuer                 string  `json:"otherIssuer,omitempty"`
-	OtherSchemeNameCode         string  `json:"otherSchemeNameCode,omitzero"`
-	OtherSchemeNameProprietary  string  `json:"otherSchemeNameProprietary,omitzero"`
+	Bicfi                       string        `json:"bicfi,omitempty"`
+	ClearingSystemIdCode        string        `json:"clearingSystemIdCode,omitzero"`
+	ClearingSystemIdProprietary string        `json:"clearingSystemIdProprietary,omitzero"`
+	MemberId                    string        `json:"memberId,omitempty"`
+	Lei                         string        `json:"lei,omitempty"`
+	Name                        string        `json:"name,omitempty"`
+	PostalAddress               PostalAddress `json:"postalAddress,omitzero"`
+	OtherId                     string        `json:"otherId,omitempty"`
+	OtherIssuer                 string        `json:"otherIssuer,omitempty"`
+	OtherSchemeNameCode         string        `json:"otherSchemeNameCode,omitzero"`
+	OtherSchemeNameProprietary  string        `json:"otherSchemeNameProprietary,omitzero"`
 }
 
 type BrnchId struct {
-	Id            string  `json:"id,omitempty"`
-	Lei           string  `json:"lei,omitempty"`
-	Name          string  `json:"name,omitempty"`
-	PostalAddress PstlAdr `json:"postalAddress,omitzero"`
+	Id            string        `json:"id,omitempty"`
+	Lei           string        `json:"lei,omitempty"`
+	Name          string        `json:"name,omitempty"`
+	PostalAddress PostalAddress `json:"postalAddress,omitzero"`
 }
 
 type Charges struct {
