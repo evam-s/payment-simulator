@@ -1,8 +1,8 @@
 package mapping
 
 import (
-	"encoding/json"
-	"errors"
+	// "encoding/json"
+	// "errors"
 	"log"
 	"payment-simulator/internal/iso20022/isomodels"
 	"payment-simulator/internal/models"
@@ -26,9 +26,9 @@ func MapPacs008ToPo(isoPacs *isomodels.Pacs008) (error, *models.PaymentOrder) {
 
 	grpHdr := isoPacs.FIToFICstmrCdtTrf.GrpHdr
 
-	if len(isoPacs.FIToFICstmrCdtTrf.CdtTrfTxInf) == 0 {
-		return errors.New("Minimum Number of FIToFICstmrCdtTrf.CdtTrfTxInf must be 1"), nil
-	}
+	// if len(isoPacs.FIToFICstmrCdtTrf.CdtTrfTxInf) == 0 {
+	// 	return errors.New("Minimum Number of FIToFICstmrCdtTrf.CdtTrfTxInf must be 1"), nil
+	// }
 
 	txn := isoPacs.FIToFICstmrCdtTrf.CdtTrfTxInf[0]
 
@@ -218,8 +218,20 @@ func MapPacs008ToPo(isoPacs *isomodels.Pacs008) (error, *models.PaymentOrder) {
 		}
 	}
 
-	x, _ := json.MarshalIndent(po, "", "  ")
-	log.Println("mapping po: ", string(x))
+	if txn.Cdtr.PstlAdr.AdrTp.Prtry != nil {
+		if txn.Cdtr.PstlAdr.AdrTp.Prtry.Id != "" {
+			po.Creditor.PostalAddress.AddressTypeProprietaryId = txn.Cdtr.PstlAdr.AdrTp.Prtry.Id
+		}
+		if txn.Cdtr.PstlAdr.AdrTp.Prtry.Issr != "" {
+			po.Creditor.PostalAddress.AddressTypeProprietaryIssuer = txn.Cdtr.PstlAdr.AdrTp.Prtry.Issr
+		}
+		if txn.Cdtr.PstlAdr.AdrTp.Prtry.SchmeNm != "" {
+			po.Creditor.PostalAddress.AddressTypeProprietarySchemeName = txn.Cdtr.PstlAdr.AdrTp.Prtry.SchmeNm
+		}
+	}
+
+	// x, _ := json.MarshalIndent(po, "", "  ")
+	// log.Println("mapping po: ", string(x))
 	return nil, &po
 }
 
