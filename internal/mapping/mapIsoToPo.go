@@ -26,10 +26,6 @@ func MapPacs008ToPo(isoPacs *isomodels.Pacs008) (error, *models.PaymentOrder) {
 
 	grpHdr := isoPacs.FIToFICstmrCdtTrf.GrpHdr
 
-	// if len(isoPacs.FIToFICstmrCdtTrf.CdtTrfTxInf) == 0 {
-	// 	return errors.New("Minimum Number of FIToFICstmrCdtTrf.CdtTrfTxInf must be 1"), nil
-	// }
-
 	txn := isoPacs.FIToFICstmrCdtTrf.CdtTrfTxInf[0]
 
 	var charges []models.Charges

@@ -4,17 +4,16 @@ type Pacs002 struct {
 	FIToFIPmtStsRpt FIToFIPmtStsRpt `xml:"FIToFIPmtStsRpt" binding:"required"`
 }
 
-// FIToFIPaymentStatusReportV15 is the main pacs.002 message
 type FIToFIPmtStsRpt struct {
 	GrpHdr            GrpHdrPacs002       `xml:"GrpHdr" binding:"required"`
-	OrgnlGrpInfAndSts []OrgnlGrpInfAndSts `xml:"OrgnlGrpInfAndSts,omitempty"`
-	TxInfAndSts       []TxInfAndSts       `xml:"TxInfAndSts,omitempty"`
-	SplmtryData       []SplmtryData       `xml:"SplmtryData,omitempty"`
+	OrgnlGrpInfAndSts []OrgnlGrpInfAndSts `xml:"OrgnlGrpInfAndSts,omitempty" binding:"dive"`
+	TxInfAndSts       []TxInfAndSts       `xml:"TxInfAndSts,omitempty" binding:"dive"`
+	SplmtryData       []SplmtryData       `xml:"SplmtryData,omitempty" binding:"omitempty,dive"`
 }
 
 type GrpHdrPacs002 struct {
 	MsgId       string      `xml:"MsgId" binding:"required,max=35"`
-	CreDtTm     string      `xml:"CreDtTm" binding:"required"`
+	CreDtTm     string      `xml:"CreDtTm" binding:"required,isoDateTime"`
 	InstgAgt    Agent       `xml:"InstgAgt,omitempty"`
 	InstdAgt    Agent       `xml:"InstdAgt,omitempty"`
 	OrgnlBizQry OrgnlBizQry `xml:"OrgnlBizQry,omitempty" binding:"omitempty"`
@@ -23,30 +22,40 @@ type GrpHdrPacs002 struct {
 type OrgnlBizQry struct {
 	MsgId   string `xml:"MsgId" binding:"required,max=35"`
 	MsgNmId string `xml:"MsgNmId" binding:"max=35"`
-	CreDtTm string `xml:"CreDtTm"`
+	CreDtTm string `xml:"CreDtTm" binding:"isoDateTime"`
 }
 
 type OrgnlGrpInfAndSts struct {
 	OrgnlMsgId    string          `xml:"OrgnlMsgId" binding:"required,max=35"`
 	OrgnlMsgNmId  string          `xml:"OrgnlMsgNmId" binding:"required,max=35"`
-	OrgnlCreDtTm  string          `xml:"OrgnlCreDtTm,omitempty"`
+	OrgnlCreDtTm  string          `xml:"OrgnlCreDtTm,omitempty" binding:"isoDateTime"`
 	OrgnlNbOfTxs  string          `xml:"OrgnlNbOfTxs,omitempty"`
 	OrgnlCtrlSum  float64         `xml:"OrgnlCtrlSum,omitempty"`
 	GrpSts        string          `xml:"GrpSts,omitempty"`
-	StsRsnInf     []StsRsnInf     `xml:"StsRsnInf"`
-	NbOfTxsPerSts []NbOfTxsPerSts `xml:"NbOfTxsPerSts"`
+	StsRsnInf     []StsRsnInf     `xml:"StsRsnInf" binding:"dive"`
+	NbOfTxsPerSts []NbOfTxsPerSts `xml:"NbOfTxsPerSts" binding:"dive"`
 }
 
 type TxInfAndSts struct {
-	StsId           string     `xml:"StsId,omitempty"`
-	OrgnlInstrId    string     `xml:"OrgnlInstrId,omitempty"`
-	OrgnlEndToEndId string     `xml:"OrgnlEndToEndId,omitempty"`
-	TxSts           string     `xml:"TxSts,omitempty"`
-	StsRsnInf       StsRsnInf  `xml:"StsRsnInf,omitempty"`
-	ChrgsInf        []ChrgsInf `xml:"ChrgsInf,omitempty"`
-	AccptncDtTm     string     `xml:"AccptncDtTm,omitempty"`
-	InstgAgt        Agent      `xml:"InstgAgt,omitempty"`
-	InstdAgt        Agent      `xml:"InstdAgt,omitempty"`
+	StsId             string            `xml:"StsId,omitempty" binding:"max=35"`
+	OrgnlGrpInf       OrgnlGrpInf       `xml:"OrgnlGrpInf,omitempty"`
+	OrgnlInstrId      string            `xml:"OrgnlInstrId,omitempty" binding:"max=35"`
+	OrgnlEndToEndId   string            `xml:"OrgnlEndToEndId,omitempty" binding:"max=35"`
+	OrgnlTxId         string            `xml:"OrgnlTxId,omitempty" binding:"max=35"`
+	OrgnlUETR         string            `xml:"OrgnlUETR,omitempty" binding:"uuid4"`
+	TxSts             string            `xml:"TxSts,omitempty" binding:"omitempty,min=1,max=4"`
+	StsRsnInf         []StsRsnInf       `xml:"StsRsnInf,omitempty" binding:"dive"`
+	ChrgsInf          []ChrgsInf        `xml:"ChrgsInf,omitempty" binding:"dive"`
+	AccptncDtTm       string            `xml:"AccptncDtTm,omitempty" binding:"max=35"`
+	PrcgDt            DtAndDtTmChoice   `xml:"PrcgDt,omitempty"`
+	FctvIntrBkSttlmDt DtAndDtTmChoice   `xml:"FctvIntrBkSttlmDt,omitempty"`
+	AcctSvcrRef       string            `xml:"AcctSvcrRef,omitempty" binding:"max=35"`
+	ClrSysRef         string            `xml:"ClrSysRef,omitempty" binding:"max=35"`
+	CdtSttlmKey       string            `xml:"CdtSttlmKey,omitempty" binding:"regexp=^([0-9A-F]{2}){32}$"`
+	InstgAgt          Agent             `xml:"InstgAgt,omitempty"`
+	InstdAgt          Agent             `xml:"InstdAgt,omitempty"`
+	OrgnlTxRef        OrgnlTxRefPacs002 `xml:"OrgnlTxRef,omitempty"`
+	SplmtryData       []SplmtryData     `xml:"SplmtryData,omitempty" binding:"omitempty,dive"`
 }
 
 type StsRsnInf struct {
@@ -63,4 +72,97 @@ type NbOfTxsPerSts struct {
 	DtldNbOfTxs string  `xml:"DtldNbOfTxs" binding:"required,max=15"`
 	DtldSts     string  `xml:"DtldSts" binding:"required,min=1,max=4"`
 	DtldCtrlSum float64 `xml:"DtldCtrlSum,omitempty"`
+}
+
+type OrgnlGrpInf struct {
+	OrgnlMsgId   string `xml:"OrgnlMsgId" binding:"required,max=35"`
+	OrgnlMsgNmId string `xml:"OrgnlMsgNmId" binding:"required,max=35"`
+	OrgnlCreDtTm string `xml:"OrgnlCreDtTm" binding:"isoDateTime"`
+}
+
+type DtAndDtTmChoice struct {
+	Dt   string `xml:"Dt" binding:"required_without=DtTm,isoDate"`
+	DtTm string `xml:"DtTm" binding:"required_without=Dt,isoDateTime"`
+}
+
+type OrgnlTxRefPacs002 struct {
+	IntrBkSttlmAmt Amount             `xml:"IntrBkSttlmAmt,omitempty" binding:""`
+	Amt            AmountChoice       `xml:"Amt,omitempty" binding:""`
+	IntrBkSttlmDt  string             `xml:"IntrBkSttlmDt,omitempty" binding:"isoDate"`
+	ReqdColltnDt   string             `xml:"ReqdColltnDt,omitempty" binding:"isoDate"`
+	ReqdExctnDt    DtAndDtTmChoice    `xml:"ReqdExctnDt,omitempty" binding:""`
+	CdtrSchmeId    Party              `xml:"CdtrSchmeId,omitempty" binding:""`
+	SttlmInf       SttlmInf           `xml:"SttlmInf,omitempty" binding:""`
+	PmtTpInf       PmtTpInfPacs002    `xml:"PmtTpInf,omitempty" binding:""`
+	PmtMtd         string             `xml:"PmtMtd,omitempty" binding:"omitempty,oneof=CHK TRF DD TRA"`
+	MndtRltdInf    MndtRltdChoice     `xml:"MndtRltdInf,omitempty" binding:""`
+	RmtInf         RmtInf             `xml:"RmtInf,omitempty" binding:""`
+	UltmtDbtr      PartyOrAgentChoice `xml:"UltmtDbtr,omitempty" binding:""`
+	Dbtr           PartyOrAgentChoice `xml:"Dbtr,omitempty" binding:""`
+	DbtrAcct       Account            `xml:"DbtrAcct,omitempty" binding:""`
+	DbtrAgt        string             `xml:"DbtrAgt,omitempty" binding:""`
+	DbtrAgtAcct    Account            `xml:"DbtrAgtAcct,omitempty" binding:""`
+	CdtrAgt        string             `xml:"CdtrAgt,omitempty" binding:""`
+	CdtrAgtAcct    Account            `xml:"CdtrAgtAcct,omitempty" binding:""`
+	Cdtr           PartyOrAgentChoice `xml:"Cdtr,omitempty" binding:""`
+	CdtrAcct       Account            `xml:"CdtrAcct,omitempty" binding:""`
+	UltmtCdtr      PartyOrAgentChoice `xml:"UltmtCdtr,omitempty" binding:""`
+	Purp           Purp               `xml:"Purp,omitempty" binding:""`
+}
+
+type AmountChoice struct {
+	InstdAmt Amount  `xml:"InstdAmt,omitempty" binding:"omitempty,required_without=EqvtAmt"`
+	EqvtAmt  EqvtAmt `xml:"EqvtAmt,omitempty" binding:"omitempty,required_without=InstdAmt"`
+}
+
+type EqvtAmt struct {
+	Amt      Amount `xml:"Amt,omitempty" binding:"required"`
+	CcyOfTrf string `xml:"CcyOfTrf,omitempty" binding:"required,regexp=^[A-Z]{3}$"`
+}
+
+type PmtTpInfPacs002 struct {
+	InstrPrty string    `xml:"InstrPrty,omitempty" binding:"omitempty,oneof=HIGH NORM"`
+	ClrChanl  string    `xml:"ClrChanl,omitempty" binding:"omitempty,oneof=RTGS RTNS MPNS BOOK"`
+	SvcLvl    []SvcLvl  `xml:"SvcLvl,omitempty" binding:"dive"`
+	LclInstrm LclInstrm `xml:"LclInstrm,omitempty"`
+	SeqTp     string    `xml:"SeqTp,omitempty" binding:"omitempty,oneof=FRST RCUR FNAL OOFF RPRE"`
+	CtgyPurp  CtgyPurp  `xml:"CtgyPurp,omitempty"`
+}
+
+type MndtRltdChoice struct {
+	DrctDbtMndt DrctDbtMndt `xml:"DrctDbtMndt,omitempty"`
+	CdtTrfMndt  CdtTrfMndt  `xml:"CdtTrfMndt,omitempty"`
+}
+
+type DrctDbtMndt struct {
+	MndtId        string        `xml:"MndtId,omitempty" binding:"max=35"`
+	DtOfSgntr     string        `xml:"DtOfSgntr,omitempty" binding:"isoDate"`
+	AmdmntInd     bool          `xml:"AmdmntInd,omitempty"`
+	AmdmntInfDtls AmdmntInfDtls `xml:"AmdmntInfDtls,omitempty"`
+	ElctrncSgntr  string        `xml:"ElctrncSgntr,omitempty" binding:"max=1025"`
+	FrstColltnDt  string        `xml:"FrstColltnDt,omitempty" binding:"isoDate"`
+	FnlColltnDt   string        `xml:"FnlColltnDt,omitempty" binding:"isoDate"`
+	Frqcy         Frqcy         `xml:"Frqcy,omitempty" binding:""`
+	Rsn           Rsn           `xml:"Rsn,omitempty" binding:""`
+	TrckgDays     string        `xml:"TrckgDays,omitempty" binding:"regexp=^[0-9]{2}$"`
+}
+
+type AmdmntInfDtls struct {
+	OrgnlMndtId      string  `xml:"OrgnlMndtId,omitempty" binding:"max=35"`
+	OrgnlCdtrSchmeId Party   `xml:"OrgnlCdtrSchmeId,omitempty" binding:""`
+	OrgnlCdtrAgt     Agent   `xml:"OrgnlCdtrAgt,omitempty" binding:""`
+	OrgnlCdtrAgtAcct Account `xml:"OrgnlCdtrAgtAcct,omitempty" binding:""`
+	OrgnlDbtr        Party   `xml:"OrgnlDbtr,omitempty" binding:""`
+	OrgnlDbtrAcct    Account `xml:"OrgnlDbtrAcct,omitempty" binding:""`
+	OrgnlDbtrAgt     Agent   `xml:"OrgnlDbtrAgt,omitempty" binding:""`
+	OrgnlDbtrAgtAcct Account `xml:"OrgnlDbtrAgtAcct,omitempty" binding:""`
+	OrgnlFnlColltnDt string  `xml:"OrgnlFnlColltnDt,omitempty" binding:"isoDate"`
+	OrgnlFrqcy       Frqcy   `xml:"OrgnlFrqcy,omitempty" binding:""`
+	OrgnlRsn         Rsn     `xml:"OrgnlRsn,omitempty" binding:""`
+	OrgnlTrckgDays   string  `xml:"OrgnlTrckgDays,omitempty" binding:"regexp=^[0-9]{2}$"`
+}
+
+type PartyOrAgentChoice struct {
+	Pty Party `xml:"Pty,omitempty" binding:"required_without=Agt"`
+	Agt Agent `xml:"Agt,omitempty" binding:"required_without=Pty"`
 }

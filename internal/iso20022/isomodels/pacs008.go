@@ -7,32 +7,32 @@ type Pacs008 struct {
 type FIToFICstmrCdtTrf struct {
 	GrpHdr      GrpHdrPacs008 `xml:"GrpHdr" json:"groupHeader" binding:"required"`
 	CdtTrfTxInf []CdtTrfTxInf `xml:"CdtTrfTxInf" json:"creditTransferTransaction" binding:"required,min=1,dive"`
-	SplmtryData []SplmtryData `xml:"SplmtryData" json:"supplementaryData"`
+	SplmtryData []SplmtryData `xml:"SplmtryData,omitempty" json:"supplementaryData,omitempty" binding:"omitempty,dive"`
 }
 
 type GrpHdrPacs008 struct {
-	MsgId             string   `xml:"MsgId" json:"messageId" binding:"required,max=35"`
-	CreDtTm           string   `xml:"CreDtTm" json:"creationDateTime" binding:"required"`
-	NbOfTxs           string   `xml:"NbOfTxs" json:"numberOfTxs" binding:"required,numeric,omitempty,min=1,max=15"`
-	SttlmInf          SttlmInf `xml:"SttlmInf" json:"settlementInfo" binding:"required"`
-	XpryDtTm          string   `xml:"XpryDtTm,omitempty" json:"expiryDateTime,omitempty"`
-	BtchBookg         bool     `xml:"BtchBookg,omitempty" json:"batchBooking,omitempty"`
-	CtrlSum           float64  `xml:"CtrlSum,omitempty" json:"controlSum,omitempty"`
-	TtlIntrBkSttlmAmt Amount   `xml:"TtlIntrBkSttlmAmt,omitempty" json:"totalSettlementAmount,omitzero"`
-	IntrBkSttlmDt     string   `xml:"IntrBkSttlmDt,omitempty" json:"settlementDate,omitempty"`
-	PmtTpInf          PmtTpInf `xml:"PmtTpInf,omitempty" json:"paymentTypeInfo,omitzero"`
-	InstgAgt          Agent    `xml:"InstgAgt,omitempty" json:"instructingAgent,omitzero"`
-	InstdAgt          Agent    `xml:"InstdAgt,omitempty" json:"instructedAgent,omitzero"`
+	MsgId             string          `xml:"MsgId" json:"messageId" binding:"required,max=35"`
+	CreDtTm           string          `xml:"CreDtTm" json:"creationDateTime" binding:"required,isoDateTime"`
+	NbOfTxs           string          `xml:"NbOfTxs" json:"numberOfTxs" binding:"required,numeric,omitempty,min=1,max=15"`
+	SttlmInf          SttlmInf        `xml:"SttlmInf" json:"settlementInfo" binding:"required"`
+	XpryDtTm          string          `xml:"XpryDtTm,omitempty" json:"expiryDateTime,omitempty" binding:"required,isoDateTime"`
+	BtchBookg         bool            `xml:"BtchBookg,omitempty" json:"batchBooking,omitempty"`
+	CtrlSum           float64         `xml:"CtrlSum,omitempty" json:"controlSum,omitempty"`
+	TtlIntrBkSttlmAmt Amount          `xml:"TtlIntrBkSttlmAmt,omitempty" json:"totalSettlementAmount,omitzero"`
+	IntrBkSttlmDt     string          `xml:"IntrBkSttlmDt,omitempty" json:"settlementDate,omitempty" binding:"isoDate"`
+	PmtTpInf          PmtTpInfPacs008 `xml:"PmtTpInf,omitempty" json:"paymentTypeInfo,omitzero"`
+	InstgAgt          Agent           `xml:"InstgAgt,omitempty" json:"instructingAgent,omitzero"`
+	InstdAgt          Agent           `xml:"InstdAgt,omitempty" json:"instructedAgent,omitzero"`
 }
 
 type SttlmInf struct {
 	SttlmMtd string `xml:"SttlmMtd" json:"settlementMethod"`
 }
 
-type PmtTpInf struct {
+type PmtTpInfPacs008 struct {
 	InstrPrty string    `xml:"InstrPrty,omitempty" json:"instructionPriority,omitempty" binding:"omitempty,oneof=HIGH NORM"`
 	ClrChanl  string    `xml:"ClrChanl,omitempty" json:"clearingChannel,omitempty" binding:"omitempty,oneof=RTGS RTNS MPNS BOOK"`
-	SvcLvl    []SvcLvl  `xml:"SvcLvl,omitempty" json:"serviceLevel,omitempty"`
+	SvcLvl    []SvcLvl  `xml:"SvcLvl,omitempty" json:"serviceLevel,omitempty" binding:"omitempty,dive"`
 	LclInstrm LclInstrm `xml:"LclInstrm,omitempty" json:"localInstrument,omitzero"`
 	CtgyPurp  CtgyPurp  `xml:"CtgyPurp,omitempty" json:"categoryPurpose,omitzero"`
 }
@@ -85,9 +85,9 @@ type BrnchId struct {
 
 type CdtTrfTxInf struct {
 	PmtId             PmtId             `xml:"PmtId" json:"paymentId" binding:"required"`
-	PmtTpInf          PmtTpInf          `xml:"PmtTpInf,omitempty" json:"paymentTypeInfo,omitzero"`
+	PmtTpInf          PmtTpInfPacs008   `xml:"PmtTpInf,omitempty" json:"paymentTypeInfo,omitzero"`
 	IntrBkSttlmAmt    Amount            `xml:"IntrBkSttlmAmt" json:"settlementAmount" binding:"required"`
-	IntrBkSttlmDt     string            `xml:"IntrBkSttlmDt" json:"settlementDate" binding:"required"`
+	IntrBkSttlmDt     string            `xml:"IntrBkSttlmDt" json:"settlementDate" binding:"required,isoDate"`
 	SttlmPrty         string            `xml:"SttlmPrty,omitempty" json:"settlementPriority,omitempty"`
 	SttlmTmIndctn     SttlmTmIndctn     `xml:"SttlmTmIndctn,omitempty" json:"settlementTimeIndication,omitzero"`
 	SttlmTmReq        SttlmTmReq        `xml:"SttlmTmReq,omitempty" json:"settlementTimeRequest,omitzero"`
@@ -96,8 +96,8 @@ type CdtTrfTxInf struct {
 	XchgRate          float64           `xml:"XchgRate,omitempty" json:"exchangeRate,omitempty"`
 	AgrdRate          AgrdRate          `xml:"AgrdRate,omitempty" json:"agreedRate,omitzero"`
 	ChrgBr            string            `xml:"ChrgBr,omitempty" json:"chargeBearer,omitempty" binding:"omitempty,oneof=DEBT CRED SHAR SLEV"`
-	ChrgsInf          []ChrgsInf        `xml:"ChrgsInf,omitempty" json:"chargesInfo,omitempty"`
-	MndtRltdInf       MndtRltdInf       `xml:"MndtRltdInf,omitempty" json:"mandateRelatedInfo,omitzero"`
+	ChrgsInf          []ChrgsInf        `xml:"ChrgsInf,omitempty" json:"chargesInfo,omitempty" binding:"dive"`
+	MndtRltdInf       CdtTrfMndt        `xml:"MndtRltdInf,omitempty" json:"mandateRelatedInfo,omitzero"`
 	PmtSgntr          PmtSgntr          `xml:"PmtSgntr,omitempty" json:"paymentSignature,omitzero"`
 	PrvsInstgAgt1     Agent             `xml:"PrvsInstgAgt1,omitempty" json:"pia1,omitzero"`
 	PrvsInstgAgt1Acct Account           `xml:"PrvsInstgAgt1Acct,omitempty" json:"pia1Account,omitzero"`
@@ -124,14 +124,14 @@ type CdtTrfTxInf struct {
 	Cdtr              Party             `xml:"Cdtr" json:"creditor" binding:"required"`
 	CdtrAcct          Account           `xml:"CdtrAcct" json:"creditorAccount" binding:"required"`
 	UltmtCdtr         Party             `xml:"UltmtCdtr,omitempty" json:"ultimateCreditor,omitzero"`
-	InstrForCdtrAgt   []InstrForCdtrAgt `xml:"InstrForCdtrAgt,omitempty" json:"instructionsForCreditorAgent,omitempty"`
-	InstrForNxtAgt    []InstrForNxtAgt  `xml:"InstrForNxtAgt,omitempty" json:"instructionsForNextAgent,omitempty"`
+	InstrForCdtrAgt   []InstrForCdtrAgt `xml:"InstrForCdtrAgt,omitempty" json:"instructionsForCreditorAgent,omitempty" binding:"dive"`
+	InstrForNxtAgt    []InstrForNxtAgt  `xml:"InstrForNxtAgt,omitempty" json:"instructionsForNextAgent,omitempty" binding:"dive"`
 	Purp              Purp              `xml:"Purp,omitempty" json:"purpose,omitzero"`
-	RgltryRptg        []RgltryRptg      `xml:"RgltryRptg,omitempty" json:"regulatoryReporting,omitempty" binding:"max=10"`
+	RgltryRptg        []RgltryRptg      `xml:"RgltryRptg,omitempty" json:"regulatoryReporting,omitempty" binding:"max=10,dive"`
 	Tax               Tax               `xml:"Tax,omitempty" json:"tax,omitzero"`
-	RltdRmtInf        []RltdRmtInf      `xml:"RltdRmtInf,omitempty" json:"relatedRemittanceInfo,omitempty"`
+	RltdRmtInf        []RltdRmtInf      `xml:"RltdRmtInf,omitempty" json:"relatedRemittanceInfo,omitempty" binding:"dive"`
 	RmtInf            RmtInf            `xml:"RmtInf,omitempty" json:"remittanceInfo,omitzero"`
-	SplmtryData       []SplmtryData     `xml:"SplmtryData,omitempty" json:"supplementaryData,omitzero"`
+	SplmtryData       []SplmtryData     `xml:"SplmtryData,omitempty" json:"supplementaryData,omitzero" binding:"omitempty,dive"`
 }
 
 type PmtId struct {
@@ -148,8 +148,8 @@ type Amount struct {
 }
 
 type SttlmTmIndctn struct {
-	DbtDtTm string `xml:"DbtDtTm,omitempty" json:"debitDateTime,omitempty"`
-	CdtDtTm string `xml:"CdtDtTm,omitempty" json:"creditDateTime,omitempty"`
+	DbtDtTm string `xml:"DbtDtTm,omitempty" json:"debitDateTime,omitempty" binding:"isoDateTime"`
+	CdtDtTm string `xml:"CdtDtTm,omitempty" json:"creditDateTime,omitempty" binding:"isoDateTime"`
 }
 
 type SttlmTmReq struct {
@@ -160,16 +160,16 @@ type SttlmTmReq struct {
 }
 
 type AddtlDtTm struct {
-	AccptncDtTm     string `xml:"AccptncDtTm,omitempty" json:"acceptanceDateTime,omitempty"`
-	PoolgAdjstmntDt string `xml:"PoolgAdjstmntDt,omitempty" json:"poolingAdjustmentDate,omitempty"`
-	XpryDtTm        string `xml:"XpryDtTm,omitempty" json:"expiryDateTime,omitempty"`
+	AccptncDtTm     string `xml:"AccptncDtTm,omitempty" json:"acceptanceDateTime,omitempty" binding:"isoDateTime"`
+	PoolgAdjstmntDt string `xml:"PoolgAdjstmntDt,omitempty" json:"poolingAdjustmentDate,omitempty" binding:"isoDate"`
+	XpryDtTm        string `xml:"XpryDtTm,omitempty" json:"expiryDateTime,omitempty" binding:"isoDateTime"`
 }
 
 type AgrdRate struct {
 	UnitCcy         string  `xml:"UnitCcy,omitempty" json:"unitCurrency,omitempty" binding:"regexp=^[A-Z]{3}$"`
 	QtdCcy          string  `xml:"QtdCcy,omitempty" json:"quotedCurrency,omitempty" binding:"regexp=^[A-Z]{3}$"`
 	PreAgrdXchgRate float64 `xml:"PreAgrdXchgRate" json:"preAgreedExchangeRate" binding:"required"`
-	QtnDtTm         string  `xml:"QtnDtTm,omitempty" json:"quotationDateTime,omitempty"`
+	QtnDtTm         string  `xml:"QtnDtTm,omitempty" json:"quotationDateTime,omitempty" binding:"isoDateTime"`
 	QtId            string  `xml:"QtId,omitempty" json:"quoteId,omitempty" binding:"uuid4"`
 	FXAgt           Agent   `xml:"FXAgt,omitempty" json:"foreignExchangeAgent,omitzero"`
 }
@@ -190,26 +190,26 @@ type ChrgsTpPrtry struct {
 	Issr string `xml:"Issr,omitempty" json:"issuer,omitempty"`
 }
 
-type MndtRltdInf struct {
-	MndtId       string         `xml:"MndtId,omitempty" json:"mandateId,omitempty" binding:"max=35"`
-	Tp           MndtRltdInfTp  `xml:"Tp,omitempty" json:"type,omitzero"`
-	DtOfSgntr    string         `xml:"DtOfSgntr,omitempty" json:"dateOfSignature,omitempty"`
-	DtOfVrfctn   string         `xml:"DtOfVrfctn,omitempty" json:"dateOfVerification,omitempty"`
-	ElctrncSgntr []byte         `xml:"ElctrncSgntr,omitempty" json:"electronicSignature,omitempty"`
-	FrstPmtDt    string         `xml:"FrstPmtDt,omitempty" json:"firstPaymentDate,omitempty"`
-	FnlPmtDt     string         `xml:"FnlPmtDt,omitempty" json:"finalPaymentDate,omitempty"`
-	Frqcy        Frqcy          `xml:"Frqcy,omitempty" json:"frequency,omitzero"`
-	Rsn          MndtRltdInfRsn `xml:"Rsn,omitempty" json:"reason,omitzero"`
+type CdtTrfMndt struct {
+	MndtId       string        `xml:"MndtId,omitempty" json:"mandateId,omitempty" binding:"max=35"`
+	Tp           CdtTrfMndtTp  `xml:"Tp,omitempty" json:"type,omitzero"`
+	DtOfSgntr    string        `xml:"DtOfSgntr,omitempty" json:"dateOfSignature,omitempty" binding:"isoDate"`
+	DtOfVrfctn   string        `xml:"DtOfVrfctn,omitempty" json:"dateOfVerification,omitempty" binding:"isoDateTime"`
+	ElctrncSgntr []byte        `xml:"ElctrncSgntr,omitempty" json:"electronicSignature,omitempty"`
+	FrstPmtDt    string        `xml:"FrstPmtDt,omitempty" json:"firstPaymentDate,omitempty" binding:"isoDate"`
+	FnlPmtDt     string        `xml:"FnlPmtDt,omitempty" json:"finalPaymentDate,omitempty" binding:"isoDate"`
+	Frqcy        Frqcy         `xml:"Frqcy,omitempty" json:"frequency,omitzero"`
+	Rsn          CdtTrfMndtRsn `xml:"Rsn,omitempty" json:"reason,omitzero"`
 }
 
-type MndtRltdInfTp struct {
-	SvcLvl    []SvcLvl              `xml:"SvcLvl,omitempty" json:"serviceLevel,omitempty"`
-	LclInstrm LclInstrm             `xml:"LclInstrm,omitempty" json:"localInstrument,omitzero"`
-	CtgyPurp  CtgyPurp              `xml:"CtgyPurp,omitempty" json:"categoryPurpose,omitzero"`
-	Clssfctn  MndtRltdInfTpClssfctn `xml:"Clssfctn,omitempty" json:"classification,omitzero"`
+type CdtTrfMndtTp struct {
+	SvcLvl    []SvcLvl             `xml:"SvcLvl,omitempty" json:"serviceLevel,omitempty" binding:"dive"`
+	LclInstrm LclInstrm            `xml:"LclInstrm,omitempty" json:"localInstrument,omitzero"`
+	CtgyPurp  CtgyPurp             `xml:"CtgyPurp,omitempty" json:"categoryPurpose,omitzero"`
+	Clssfctn  CdtTrfMndtTpClssfctn `xml:"Clssfctn,omitempty" json:"classification,omitzero"`
 }
 
-type MndtRltdInfTpClssfctn struct {
+type CdtTrfMndtTpClssfctn struct {
 	Cd    string `xml:"Cd,omitempty" json:"code,omitempty" binding:"required_without=Prtry,omitempty,oneof=FIXE USGB VARI"`
 	Prtry string `xml:"Prtry,omitempty" json:"proprietary,omitempty" binding:"max=35,required_without=Cd"`
 }
@@ -230,7 +230,7 @@ type PtInTm struct {
 	PtInTm string `xml:"PtInTm,omitempty" json:"pointInTime,omitempty" binding:"omitempty,regexp=^[0-9]{2}$"`
 }
 
-type MndtRltdInfRsn struct {
+type CdtTrfMndtRsn struct {
 	Cd    string `xml:"Cd,omitempty" json:"code,omitempty" binding:"omitempty,min=1,max=4,required_without=Prtry"`
 	Prtry string `xml:"Prtry,omitempty" json:"proprietary,omitempty" binding:"max=35,required_without=Cd"`
 }
@@ -299,7 +299,7 @@ type PartyId struct {
 type OrgId struct {
 	AnyBIC string      `xml:"AnyBIC,omitempty" json:"anyBic,omitempty"`
 	LEI    string      `xml:"LEI,omitempty" json:"lei,omitempty" binding:"omitempty,regexp=^[A-Z0-9]{18}[0-9]{2}$"`
-	Othr   []OrgIdOthr `xml:"Othr,omitempty" json:"other,omitzero"`
+	Othr   []OrgIdOthr `xml:"Othr,omitempty" json:"other,omitzero" binding:"dive"`
 }
 
 type OrgIdOthr struct {
@@ -314,12 +314,12 @@ type OrgSchmeNm struct {
 }
 
 type PrvtId struct {
-	DtAndPlcOfBirth DateAndPlaceOfBirth `xml:"DtAndPlcOfBirth,omitempty" json:"dateAndPlaceOfBirth,omitzero"`
-	Othr            []PrvtIdOthr        `xml:"Othr,omitempty" json:"other,omitzero"`
+	DtAndPlcOfBirth DateAndPlaceOfBirth `xml:"DtAndPlcOfBirth,omitempty" json:"dateAndPlaceOfBirth,omitzero" binding:"omitempty"`
+	Othr            []PrvtIdOthr        `xml:"Othr,omitempty" json:"other,omitzero" binding:"dive"`
 }
 
 type DateAndPlaceOfBirth struct {
-	BirthDt     string `xml:"BirthDt,omitempty" json:"birthDate,omitempty"`
+	BirthDt     string `xml:"BirthDt" json:"birthDate" binding:"required,isoDate"`
 	PrvcOfBirth string `xml:"PrvcOfBirth,omitempty" json:"provinceOfBirth,omitempty"`
 	CityOfBirth string `xml:"CityOfBirth,omitempty" json:"cityOfBirth,omitempty"`
 	CtryOfBirth string `xml:"CtryOfBirth,omitempty" json:"countryOfBirth,omitempty" binding:"omitempty,regexp=^[A-Z]{2}$"`
@@ -337,19 +337,19 @@ type PersonSchmeNm struct {
 }
 
 type CtctDtls struct {
-	NmPrfx    string        `xml:"NmPrfx,omitempty" json:"namePrefix,omitempty"`
-	Nm        string        `xml:"Nm,omitempty" json:"name,omitempty"`
-	PhneNb    string        `xml:"PhneNb,omitempty" json:"phoneNumber,omitempty" binding:"required,e164PhoneNumbers"`
-	MobNb     string        `xml:"MobNb,omitempty" json:"mobileNumber,omitempty" binding:"required,e164PhoneNumbers"`
-	FaxNb     string        `xml:"FaxNb,omitempty" json:"faxNumber,omitempty" binding:"required,e164PhoneNumbers"`
-	URLAdr    string        `xml:"URLAdr,omitempty" json:"urlAddress,omitempty"`
+	NmPrfx    string        `xml:"NmPrfx,omitempty" json:"namePrefix,omitempty" binding:"omitempty,oneof=DOCT MADM MISS MIST MIKS"`
+	Nm        string        `xml:"Nm,omitempty" json:"name,omitempty" binding:"max=140"`
+	PhneNb    string        `xml:"PhneNb,omitempty" json:"phoneNumber,omitempty" binding:"e164PhoneNumbers"`
+	MobNb     string        `xml:"MobNb,omitempty" json:"mobileNumber,omitempty" binding:"e164PhoneNumbers"`
+	FaxNb     string        `xml:"FaxNb,omitempty" json:"faxNumber,omitempty" binding:"e164PhoneNumbers"`
+	URLAdr    string        `xml:"URLAdr,omitempty" json:"urlAddress,omitempty" binding:"max=2048"`
 	EmailAdr  string        `xml:"EmailAdr,omitempty" json:"emailAddress,omitempty" binding:"email"`
-	EmailPurp string        `xml:"EmailPurp,omitempty" json:"emailPurpose,omitempty"`
-	JobTitl   string        `xml:"JobTitl,omitempty" json:"jobTitle,omitempty"`
-	Rspnsblty string        `xml:"Rspnsblty,omitempty" json:"responsibility,omitempty"`
-	Dept      string        `xml:"Dept,omitempty" json:"department,omitempty"`
-	Othr      []ContactOthr `xml:"Othr,omitempty" json:"other,omitzero"`
-	PrefrdMtd string        `xml:"PrefrdMtd,omitempty" json:"preferredMethod,omitempty"`
+	EmailPurp string        `xml:"EmailPurp,omitempty" json:"emailPurpose,omitempty" binding:"max=35"`
+	JobTitl   string        `xml:"JobTitl,omitempty" json:"jobTitle,omitempty" binding:"max=35"`
+	Rspnsblty string        `xml:"Rspnsblty,omitempty" json:"responsibility,omitempty" binding:"max=35"`
+	Dept      string        `xml:"Dept,omitempty" json:"department,omitempty" binding:"max=70"`
+	Othr      []ContactOthr `xml:"Othr,omitempty" json:"other,omitzero" binding:"dive"`
+	PrefrdMtd string        `xml:"PrefrdMtd,omitempty" json:"preferredMethod,omitempty" binding:"omitempty,oneof=MAIL FAXX LETT CELL ONLI PHON"`
 }
 
 type ContactOthr struct {
@@ -409,7 +409,7 @@ type Purp struct {
 type RgltryRptg struct {
 	DbtCdtRptgInd string            `xml:"DbtCdtRptgInd,omitempty" json:"debitCreditReportingIndicator,omitempty" binding:"omitempty,oneof=CRED DEBT BOTH"`
 	Authrty       RgltryRptgAuthrty `xml:"Authrty,omitempty" json:"authority,omitzero"`
-	Dtls          []RgltryRptgDtls  `xml:"Dtls,omitempty" json:"details,omitempty"`
+	Dtls          []RgltryRptgDtls  `xml:"Dtls,omitempty" json:"details,omitempty" binding:"dive"`
 }
 
 type RgltryRptgAuthrty struct {
@@ -419,7 +419,7 @@ type RgltryRptgAuthrty struct {
 
 type RgltryRptgDtls struct {
 	Tp   string   `xml:"Tp,omitempty" json:"type,omitempty" binding:"max=35"`
-	Dt   string   `xml:"Dt,omitempty" json:"date,omitempty"`
+	Dt   string   `xml:"Dt,omitempty" json:"date,omitempty" binding:"isoDate"`
 	Ctry string   `xml:"Ctry,omitempty" json:"country,omitempty" binding:"regexp=^[A-Z]{2}$"`
 	Cd   string   `xml:"Cd,omitempty" json:"code,omitempty" binding:"omitempty,min=1,max=10"`
 	Amt  Amount   `xml:"Amt,omitempty" json:"amount,omitzero"`
@@ -435,9 +435,9 @@ type Tax struct {
 	Mtd             string    `xml:"Mtd,omitempty" json:"method,omitempty"`
 	TtlTaxblBaseAmt Amount    `xml:"TtlTaxblBaseAmt,omitempty" json:"totalTaxableBaseAmount,omitzero"`
 	TtlTaxAmt       Amount    `xml:"TtlTaxAmt,omitempty" json:"totalTaxAmount,omitzero"`
-	Dt              string    `xml:"Dt,omitempty" json:"date,omitempty"`
+	Dt              string    `xml:"Dt,omitempty" json:"date,omitempty" binding:"isoDate"`
 	SeqNb           int64     `xml:"SeqNb,omitempty" json:"sequenceNumber,omitempty"`
-	Rcrd            []TaxRcrd `xml:"Rcrd,omitempty" json:"records,omitempty"`
+	Rcrd            []TaxRcrd `xml:"Rcrd,omitempty" json:"records,omitempty" binding:"dive"`
 }
 
 type TaxParty1 struct {
@@ -477,8 +477,8 @@ type TaxPrd struct {
 }
 
 type DatePrd struct {
-	FrDt string `xml:"FrDt,omitempty" json:"fromDate,omitempty"`
-	ToDt string `xml:"ToDt,omitempty" json:"toDate,omitempty"`
+	FrDt string `xml:"FrDt,omitempty" json:"fromDate,omitempty" binding:"isoDate"`
+	ToDt string `xml:"ToDt,omitempty" json:"toDate,omitempty" binding:"isoDate"`
 }
 
 type TaxAmt struct {
@@ -495,7 +495,7 @@ type TaxAmtDtls struct {
 
 type RltdRmtInf struct {
 	RmtId       string        `xml:"RmtId,omitempty" json:"remittanceId,omitempty"`
-	RmtLctnDtls []RmtLctnDtls `xml:"RmtLctnDtls,omitempty" json:"remittanceLocationDetails,omitempty"`
+	RmtLctnDtls []RmtLctnDtls `xml:"RmtLctnDtls,omitempty" json:"remittanceLocationDetails,omitempty" binding:"dive"`
 }
 
 type RmtLctnDtls struct {
@@ -511,11 +511,11 @@ type NmAndAdr struct {
 
 type RmtInf struct {
 	Ustrd []string     `xml:"Ustrd,omitempty" json:"ustrdRemittanceInfo,omitempty"`
-	Strd  []RmtInfStrd `xml:"Strd,omitempty" json:"strdRemittanceInfo,omitempty"`
+	Strd  []RmtInfStrd `xml:"Strd,omitempty" json:"strdRemittanceInfo,omitempty" binding:"dive"`
 }
 
 type RmtInfStrd struct {
-	RfrdDocInf  []RfrdDocInf   `xml:"RfrdDocInf,omitempty" json:"referredDocumentInfo,omitempty"`
+	RfrdDocInf  []RfrdDocInf   `xml:"RfrdDocInf,omitempty" json:"referredDocumentInfo,omitempty" binding:"dive"`
 	RfrdDocAmt  LineDtlsAmount `xml:"RfrdDocAmt,omitempty" json:"referredDocumentAmount,omitzero"`
 	CdtrRefInf  CdtrRefInf     `xml:"CdtrRefInf,omitempty" json:"creditorReferenceInfo,omitzero"`
 	Invcr       Party          `xml:"Invcr,omitempty" json:"invoicer,omitzero"`
@@ -529,7 +529,7 @@ type RfrdDocInf struct {
 	Tp       RfrdDocInfTp `xml:"Tp,omitempty" json:"type,omitzero"`
 	Nb       string       `xml:"Nb,omitempty" json:"number,omitempty"`
 	RltdDt   DtAndTp      `xml:"RltdDt,omitempty" json:"relatedDate,omitzero"`
-	LineDtls []LineDtls   `xml:"LineDtls,omitempty" json:"lineDetails,omitempty"`
+	LineDtls []LineDtls   `xml:"LineDtls,omitempty" json:"lineDetails,omitempty" binding:"dive"`
 }
 
 type RfrdDocInfTp struct {
@@ -544,11 +544,11 @@ type CdOrPrtry struct {
 
 type DtAndTp struct {
 	Tp string `xml:"Tp,omitempty" json:"type,omitempty"`
-	Dt string `xml:"Dt,omitempty" json:"date,omitempty"`
+	Dt string `xml:"Dt,omitempty" json:"date,omitempty" binding:"isoDate"`
 }
 
 type LineDtls struct {
-	Id   []LineDtlsId   `xml:"Id,omitempty" json:"identifiers,omitempty"`
+	Id   []LineDtlsId   `xml:"Id,omitempty" json:"identifiers,omitempty" binding:"dive"`
 	Desc string         `xml:"Desc,omitempty" json:"description,omitempty"`
 	Amt  LineDtlsAmount `xml:"Amt,omitempty" json:"Amount,omitzero"`
 }
@@ -556,7 +556,7 @@ type LineDtls struct {
 type LineDtlsId struct {
 	Tp     LineDtlsIdTp `xml:"Tp,omitempty" json:"type,omitzero"`
 	Nb     string       `xml:"Nb,omitempty" json:"number,omitempty"`
-	RltdDt string       `xml:"RltdDt,omitempty" json:"relatedDate,omitempty"`
+	RltdDt string       `xml:"RltdDt,omitempty" json:"relatedDate,omitempty" binding:"isoDate"`
 }
 
 type LineDtlsIdTp struct {
@@ -565,8 +565,8 @@ type LineDtlsIdTp struct {
 }
 
 type LineDtlsAmount struct {
-	RmtAmtAndTp       []LineDtlsRmtAmtAndTp       `xml:"RmtAmtAndTp,omitempty" json:"remittanceAmountAndType,omitempty"`
-	AdjstmntAmtAndRsn []LineDtlsAdjstmntAmtAndRsn `xml:"AdjstmntAmtAndRsn,omitempty" json:"adjustmentAmountAndReason,omitempty"`
+	RmtAmtAndTp       []LineDtlsRmtAmtAndTp       `xml:"RmtAmtAndTp,omitempty" json:"remittanceAmountAndType,omitempty" binding:"dive"`
+	AdjstmntAmtAndRsn []LineDtlsAdjstmntAmtAndRsn `xml:"AdjstmntAmtAndRsn,omitempty" json:"adjustmentAmountAndReason,omitempty" binding:"dive"`
 }
 
 type LineDtlsRmtAmtAndTp struct {
