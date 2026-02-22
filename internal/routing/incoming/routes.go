@@ -3,20 +3,17 @@ package routing
 import (
 	"bytes"
 	"context"
-	// "encoding/json"
-	"fmt"
+	"github.com/gin-gonic/gin"
+	"github.com/matoous/go-nanoid/v2"
+	"go.mongodb.org/mongo-driver/bson"
 	"io"
 	"log"
 	"net/http"
 	"payment-simulator/internal/db"
-	// "payment-simulator/internal/iso20022/isomodels"
-	"github.com/gin-gonic/gin"
-	nanoid "github.com/matoous/go-nanoid/v2"
-	"go.mongodb.org/mongo-driver/bson"
 	"payment-simulator/internal/mapping"
 	"payment-simulator/internal/processing"
+	"strings"
 	"time"
-	// "go.mongodb.org/mongo-driver/mongo/options"
 )
 
 func RoutingSetup() *gin.Engine {
@@ -28,28 +25,31 @@ func RoutingSetup() *gin.Engine {
 		c.JSON(200, gin.H{"message": "pong"})
 	})
 	router.POST("/inboundPacs008", func(c *gin.Context) {
-		fmt.Println("Payment Order Rcvd. Context: ", c)
 		bodyBytes, err := io.ReadAll(c.Request.Body)
+		headers := c.Request.Header
+
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to read request body"})
 			return
 		}
-		log.Println("Request Headers:", c.Request.Header)
+		log.Println("Request Headers:", headers)
 		c.Request.Body = io.NopCloser(bytes.NewBuffer(bodyBytes))
 
-		id, _ := nanoid.New(12)
+		id, _ := gonanoid.New(12)
 		contextBg := context.Background()
 		ctx, cancel := context.WithTimeout(contextBg, 5*time.Second)
 		defer cancel()
 
 		if res, err := db.DB.Collection("MessageLogger").InsertOne(ctx, map[string]any{
-			"_id":         id,
-			"asIsMsg":     string(bodyBytes),
-			"received_at": time.Now(),
+			"_id":          id,
+			"expectedType": "pacs008",
+			"route":        "incoming",
+			"asIsMsg":      string(bodyBytes),
+			"receivedAt":  time.Now(),
 		}); err != nil {
-			log.Printf("Failed to log raw payload: %v\n", err)
+			log.Println("Failed to log raw payload:", err)
 		} else {
-			log.Println("Logged Transaction Input, Id: ", res.InsertedID)
+			log.Println("Logged Transaction Input, Id:", res.InsertedID)
 		}
 
 		if isoPacs, err := mapping.MapXmlPacs008(c); err != nil {
@@ -64,11 +64,15 @@ func RoutingSetup() *gin.Engine {
 			defer cancel1()
 
 			// log.Println("isoPacs", isoPacs)
-			update := bson.M{"$set": bson.M{"transformedXml": isoPacs}}
+			update := bson.M{"$set": bson.M{"transformedXml": isoPacs, "actualType": strings.Split(isoPacs.Xmlns, "xsd:")[1]}}
 			db.DB.Collection("MessageLogger").UpdateByID(ctx1, id, update)
 
-			if err := processing.ProcessInboundPo(isoPacs); err != nil {
-				c.JSON(400, gin.H{"ErrorMessage": err})
+			if err := processing.ProcessInboundPo(isoPacs, id, headers); err != nil {
+				if strings.HasPrefix(err.Error(), "Failed to bind XML") {
+					c.JSON(400, gin.H{"ErrorMessage": err})
+				} else {
+					c.JSON(503, gin.H{"ErrorMessage": err})
+				}
 			} else {
 				c.JSON(200, gin.H{"PO": *isoPacs})
 			}

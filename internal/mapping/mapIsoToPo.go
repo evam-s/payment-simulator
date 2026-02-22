@@ -1,19 +1,17 @@
 package mapping
 
 import (
-	// "encoding/json"
-	// "errors"
+	"github.com/gin-gonic/gin"
 	"log"
 	"payment-simulator/internal/iso20022/isomodels"
 	"payment-simulator/internal/models"
-
-	"github.com/gin-gonic/gin"
+	"strings"
 )
 
 func MapXmlPacs008(c *gin.Context) (*isomodels.Pacs008, error) {
 	var isoPacs isomodels.Pacs008
 	if err := c.ShouldBindXML(&isoPacs); err != nil {
-		log.Println("Error in Binding to XML: ", isoPacs, "Error:", err)
+		log.Println("Error in Binding to XML:", isoPacs, "Error:", err)
 		return nil, err
 	} else {
 		return &isoPacs, nil
@@ -21,65 +19,86 @@ func MapXmlPacs008(c *gin.Context) (*isomodels.Pacs008, error) {
 }
 
 func MapPacs008ToPo(isoPacs *isomodels.Pacs008) (error, *models.PaymentOrder) {
-
 	var po models.PaymentOrder
-
 	grpHdr := isoPacs.FIToFICstmrCdtTrf.GrpHdr
-
 	txn := isoPacs.FIToFICstmrCdtTrf.CdtTrfTxInf[0]
-
-	var charges []models.Charges
-
+	var charges []*models.Charges
 	for _, ch := range txn.ChrgsInf {
-		charges = append(charges, models.Charges{
-			Amount: *mapAmount(ch.Amt),
-			Agent:  *mapAgent(ch.Agt),
-			Type: models.ChrgsTp{
-				Code:              ch.Tp.Cd,
-				ProprietaryId:     ch.Tp.Prtry.Id,
-				ProprietaryIssuer: ch.Tp.Prtry.Issr,
-			},
-		})
+		chg := models.Charges{
+			Amount: mapAmount(ch.Amt),
+			Agent:  mapIsoAgent(ch.Agt),
+		}
+		if ch.Tp != nil {
+			chg.Type = &models.ChrgsTp{}
+			chg.Type.Code = ch.Tp.Cd
+			if ch.Tp.Prtry != nil {
+				chg.Type.ProprietaryId = ch.Tp.Prtry.Id
+				chg.Type.ProprietaryIssuer = ch.Tp.Prtry.Issr
+			}
+		}
+		charges = append(charges, &chg)
 	}
 
 	po = models.PaymentOrder{
-		Debtor:                  *mapParty(txn.Dbtr),
-		DebtorAcct:              *mapAccount(txn.DbtrAcct),
-		Creditor:                *mapParty(txn.Cdtr),
-		CreditorAcct:            *mapAccount(txn.CdtrAcct),
-		SettlementAmount:        *mapAmount(txn.IntrBkSttlmAmt),
-		InstructionId:           txn.PmtId.InstrId,
-		TransactionId:           txn.PmtId.TxId,
-		EndToEndId:              txn.PmtId.EndToEndId,
-		UETR:                    txn.PmtId.UETR,
-		ClearingSystemReference: txn.PmtId.ClrSysRef,
-		MsgId:                   grpHdr.MsgId,
-		CreationDateTime:        grpHdr.CreDtTm,
-		NumberOfTxs:             grpHdr.NbOfTxs,
-		SettlementMethod:        grpHdr.SttlmInf.SttlmMtd,
-		ControlSum:              grpHdr.CtrlSum,
-		SettlementDate:          txn.IntrBkSttlmDt,
-		SettlementPriority:      txn.SttlmPrty,
-		RemittanceInfo:          txn.RmtInf.Ustrd,
-		Purpose:                 txn.Purp.Cd,
-		ChargeBearer:            txn.ChrgBr,
-		Charges:                 charges,
+		Debtor:                     mapIsoParty(txn.Dbtr),
+		UltimateDebtor:             mapIsoParty(txn.UltmtDbtr),
+		DebtorAcct:                 mapIsoAccount(txn.DbtrAcct),
+		DebtorAgent:                mapIsoAgent(txn.DbtrAgt),
+		DebtorAgentAcct:            mapIsoAccount(txn.DbtrAgtAcct),
+		Creditor:                   mapIsoParty(txn.Cdtr),
+		UltimateCreditor:           mapIsoParty(txn.UltmtCdtr),
+		CreditorAcct:               mapIsoAccount(txn.CdtrAcct),
+		CreditorAgent:              mapIsoAgent(txn.CdtrAgt),
+		CreditorAgentAcct:          mapIsoAccount(txn.CdtrAgtAcct),
+		SettlementAmount:           mapAmount(txn.IntrBkSttlmAmt),
+		InstructionId:              txn.PmtId.InstrId,
+		TransactionId:              txn.PmtId.TxId,
+		EndToEndId:                 txn.PmtId.EndToEndId,
+		UETR:                       txn.PmtId.UETR,
+		ClearingSystemReference:    txn.PmtId.ClrSysRef,
+		MessageId:                  grpHdr.MsgId,
+		MessageNameId:              strings.Split(isoPacs.Xmlns, "xsd:")[1],
+		CreationDateTime:           grpHdr.CreDtTm,
+		NumberOfTxs:                grpHdr.NbOfTxs,
+		SettlementMethod:           grpHdr.SttlmInf.SttlmMtd,
+		SettlementAcct:             mapIsoAccount(grpHdr.SttlmInf.SttlmAcct),
+		ControlSum:                 grpHdr.CtrlSum,
+		SettlementDate:             txn.IntrBkSttlmDt,
+		SettlementPriority:         txn.SttlmPrty,
+		UnstructuredRemittanceInfo: txn.RmtInf.Ustrd,
+		PurposeCode:                txn.Purp.Cd,
+		PurposeProprietary:         txn.Purp.Prtry,
+		ChargeBearer:               txn.ChrgBr,
+		Charges:                    charges,
+		PaymentTypeInfo:            mapPaymentTypeInfo(txn.PmtTpInf),
+		HeaderPaymentTypeInfo:      mapPaymentTypeInfo(grpHdr.PmtTpInf),
+		SupplementaryData:          mapSupplementaryData(txn.SplmtryData),
+		HeaderSupplementaryData:    mapSupplementaryData(isoPacs.FIToFICstmrCdtTrf.SplmtryData),
 		// ReferenceNumber :
 		// TotalTaxAmount
 	}
 
 	// x, _ := json.MarshalIndent(po, "", "  ")
-	// log.Println("mapping po: ", string(x))
+	// log.Println("mapping po:", string(x))
 	return nil, &po
 }
 
-func mapAmount(amount isomodels.Amount) *models.Amount {
+func mapAmount(amount *isomodels.Amount) *models.Amount {
+	if amount == nil {
+		return nil
+	}
+
 	return &models.Amount{
 		Value:    amount.Value,
 		Currency: amount.Currency,
 	}
 }
-func mapAgent(agent isomodels.Agent) *models.Agent {
+
+func mapIsoAgent(agent *isomodels.Agent) *models.Agent {
+	if agent == nil {
+		return nil
+	}
+
 	return &models.Agent{
 		FiiBicfi:                       agent.FinInstnId.BICFI,
 		FiiClearingSystemIdCode:        agent.FinInstnId.ClrSysMmbId.ClrSysId.Cd,
@@ -87,7 +106,7 @@ func mapAgent(agent isomodels.Agent) *models.Agent {
 		FiiMemberId:                    agent.FinInstnId.ClrSysMmbId.MmbId,
 		FiiLei:                         agent.FinInstnId.LEI,
 		FiiName:                        agent.FinInstnId.Nm,
-		FiiPostalAddress:               *mapPostalAddress(agent.FinInstnId.PstlAdr),
+		FiiPostalAddress:               mapPostalAddress(agent.FinInstnId.PstlAdr),
 		FiiOtherId:                     agent.FinInstnId.Othr.Id,
 		FiiOtherIssuer:                 agent.FinInstnId.Othr.Issr,
 		FiiOtherSchemeNameCode:         agent.FinInstnId.Othr.SchmeNm.Cd,
@@ -95,29 +114,47 @@ func mapAgent(agent isomodels.Agent) *models.Agent {
 		BiId:                           agent.BrnchId.Id,
 		BiLei:                          agent.BrnchId.LEI,
 		BiName:                         agent.BrnchId.Nm,
-		BiPostalAddress:                *mapPostalAddress(agent.BrnchId.PstlAdr),
+		BiPostalAddress:                mapPostalAddress(agent.BrnchId.PstlAdr),
 	}
 }
 
-func mapParty(party isomodels.Party) *models.Party {
-	return &models.Party{
-		Name:                     party.Nm,
-		PostalAddress:            *mapPostalAddress(party.PstlAdr),
-		OrgIdAnyBic:              party.Id.OrgId.AnyBIC,
-		OrgIdLei:                 party.Id.OrgId.LEI,
-		OrgIdOther:               *mapOrgIdOther(party.Id.OrgId.Othr),
-		PrivateIdBirthDate:       party.Id.PrvtId.DtAndPlcOfBirth.BirthDt,
-		PrivateIdCityOfBirth:     party.Id.PrvtId.DtAndPlcOfBirth.CityOfBirth,
-		PrivateIdCountryOfBirth:  party.Id.PrvtId.DtAndPlcOfBirth.CtryOfBirth,
-		PrivateIdProvinceOfBirth: party.Id.PrvtId.DtAndPlcOfBirth.PrvcOfBirth,
-		PrivateIdOther:           *mapPrvtIdOther(party.Id.PrvtId.Othr),
-		CountryOfResidence:       party.CtryOfRes,
-		ContactDetails:           *mapContactDetails(party.CtctDtls),
+func mapIsoParty(pty *isomodels.Party) *models.Party {
+	if pty == nil {
+		return nil
 	}
+
+	party := models.Party{
+		Name:               pty.Nm,
+		PostalAddress:      mapPostalAddress(pty.PstlAdr),
+		CountryOfResidence: pty.CtryOfRes,
+		ContactDetails:     mapContactDetails(pty.CtctDtls),
+	}
+
+	if pty.Id.OrgId != nil {
+		party.OrgIdAnyBic = pty.Id.OrgId.AnyBIC
+		party.OrgIdLei = pty.Id.OrgId.LEI
+		party.OrgIdOther = mapOrgIdOther(pty.Id.OrgId.Othr)
+
+	}
+
+	if pty.Id.PrvtId != nil {
+		if pty.Id.PrvtId.DtAndPlcOfBirth != nil {
+			party.PrivateIdBirthDate = pty.Id.PrvtId.DtAndPlcOfBirth.BirthDt
+			party.PrivateIdCityOfBirth = pty.Id.PrvtId.DtAndPlcOfBirth.CityOfBirth
+			party.PrivateIdCountryOfBirth = pty.Id.PrvtId.DtAndPlcOfBirth.CtryOfBirth
+			party.PrivateIdProvinceOfBirth = pty.Id.PrvtId.DtAndPlcOfBirth.PrvcOfBirth
+		}
+		party.PrivateIdOther = mapPrvtIdOther(pty.Id.PrvtId.Othr)
+	}
+
+	return &party
 }
 
-func mapAccount(account isomodels.Account) *models.Account {
-	var acct = models.Account{
+func mapIsoAccount(account *isomodels.Account) *models.Account {
+	if account == nil {
+		return nil
+	}
+	acct := models.Account{
 		Iban:            account.Id.IBAN,
 		TypeCode:        account.Tp.Cd,
 		TypeProprietary: account.Tp.Prtry,
@@ -128,54 +165,56 @@ func mapAccount(account isomodels.Account) *models.Account {
 	}
 
 	if account.Id.Othr != nil {
-		if account.Id.Othr.Id != "" {
-			acct.OtherId = account.Id.Othr.Id
-		}
-		if account.Id.Othr.Issr != "" {
-			acct.OtherIssuer = account.Id.Othr.Issr
-		}
+		acct.OtherId = account.Id.Othr.Id
+		acct.OtherIssuer = account.Id.Othr.Issr
 		if account.Id.Othr.SchmeNm != nil {
-			if account.Id.Othr.SchmeNm.Cd != "" {
-				acct.OtherSchemeNameCode = account.Id.Othr.SchmeNm.Cd
-			}
-			if account.Id.Othr.SchmeNm.Prtry != "" {
-				acct.OtherSchemeNameProprietary = account.Id.Othr.SchmeNm.Prtry
-			}
+			acct.OtherSchemeNameCode = account.Id.Othr.SchmeNm.Cd
+			acct.OtherSchemeNameProprietary = account.Id.Othr.SchmeNm.Prtry
 		}
 	}
 
 	return &acct
 }
 
-func mapOrgIdOther(orgIdOthr []isomodels.OrgIdOthr) *[]models.OrgIdOthr {
-	var orgIdOthers []models.OrgIdOthr
+func mapOrgIdOther(orgIdOthr []*isomodels.OrgIdOthr) []*models.OrgIdOthr {
+	var orgIdOthers []*models.OrgIdOthr
 
 	for _, org := range orgIdOthr {
-		orgIdOthers = append(orgIdOthers, models.OrgIdOthr{
-			Id:                    org.Id,
-			Issuer:                org.Issr,
-			SchemeNameCode:        org.SchmeNm.Cd,
-			SchemeNameProprietary: org.SchmeNm.Prtry,
-		})
+		if org != nil {
+			oio := &models.OrgIdOthr{
+				Id:     org.Id,
+				Issuer: org.Issr,
+			}
+			if org.SchmeNm != nil {
+				oio.SchemeNameCode = org.SchmeNm.Cd
+				oio.SchemeNameProprietary = org.SchmeNm.Prtry
+			}
+			orgIdOthers = append(orgIdOthers, oio)
+		}
 	}
-	return &orgIdOthers
+	return orgIdOthers
 }
 
-func mapPrvtIdOther(prvtIdOthr []isomodels.PrvtIdOthr) *[]models.PrivateIdOthr {
-	var privateIdOthr []models.PrivateIdOthr
+func mapPrvtIdOther(prvtIdOthr []*isomodels.PrvtIdOthr) []*models.PrivateIdOthr {
+	var prvtIdOthers []*models.PrivateIdOthr
 
-	for _, org := range prvtIdOthr {
-		privateIdOthr = append(privateIdOthr, models.PrivateIdOthr{
-			Id:                    org.Id,
-			Issuer:                org.Issr,
-			SchemeNameCode:        org.SchmeNm.Cd,
-			SchemeNameProprietary: org.SchmeNm.Prtry,
-		})
+	for _, pvt := range prvtIdOthr {
+		if pvt != nil {
+			pio := &models.PrivateIdOthr{
+				Id:     pvt.Id,
+				Issuer: pvt.Issr,
+			}
+			if pvt.SchmeNm != nil {
+				pio.SchemeNameCode = pvt.SchmeNm.Cd
+				pio.SchemeNameProprietary = pvt.SchmeNm.Prtry
+			}
+			prvtIdOthers = append(prvtIdOthers, pio)
+		}
 	}
-	return &privateIdOthr
+	return prvtIdOthers
 }
 
-func mapContactDetails(ctctDtls isomodels.CtctDtls) *models.ContactDetails {
+func mapContactDetails(ctctDtls *isomodels.CtctDtls) *models.ContactDetails {
 	return &models.ContactDetails{
 		NamePrefix:      ctctDtls.NmPrfx,
 		Name:            ctctDtls.Nm,
@@ -189,25 +228,25 @@ func mapContactDetails(ctctDtls isomodels.CtctDtls) *models.ContactDetails {
 		Responsibility:  ctctDtls.Rspnsblty,
 		Department:      ctctDtls.Dept,
 		PreferredMethod: ctctDtls.PrefrdMtd,
-		Other:           *mapContactOther(ctctDtls.Othr),
+		Other:           mapContactOther(ctctDtls.Othr),
 	}
 }
 
-func mapContactOther(contactOthr []isomodels.ContactOthr) *[]models.ContactOthr {
-	var contactOthers []models.ContactOthr
-
+func mapContactOther(contactOthr []*isomodels.ContactOthr) []*models.ContactOthr {
+	var contactOthers []*models.ContactOthr
 	for _, contact := range contactOthr {
-		contactOthers = append(contactOthers, models.ContactOthr{
-			Id:          contact.Id,
-			ChannelType: contact.ChanlTp,
-		})
+		if contact != nil {
+			contactOthers = append(contactOthers, &models.ContactOthr{
+				Id:          contact.Id,
+				ChannelType: contact.ChanlTp,
+			})
+		}
 	}
-	return &contactOthers
+	return contactOthers
 }
 
-func mapPostalAddress(pstlAdr isomodels.PstlAdr) *models.PostalAddress {
-	var address = models.PostalAddress{
-		AddressTypeCode:    pstlAdr.AdrTp.Cd,
+func mapPostalAddress(pstlAdr *isomodels.PstlAdr) *models.PostalAddress {
+	pa := models.PostalAddress{
 		CareOf:             pstlAdr.CareOf,
 		Department:         pstlAdr.Dept,
 		SubDepartment:      pstlAdr.SubDept,
@@ -227,17 +266,63 @@ func mapPostalAddress(pstlAdr isomodels.PstlAdr) *models.PostalAddress {
 		AddressLine:        pstlAdr.AdrLine,
 	}
 
-	if pstlAdr.AdrTp.Prtry != nil {
-		if pstlAdr.AdrTp.Prtry.Id != "" {
-			address.AddressTypeProprietaryId = pstlAdr.AdrTp.Prtry.Id
-		}
-		if pstlAdr.AdrTp.Prtry.Issr != "" {
-			address.AddressTypeProprietaryIssuer = pstlAdr.AdrTp.Prtry.Issr
-		}
-		if pstlAdr.AdrTp.Prtry.SchmeNm != "" {
-			address.AddressTypeProprietarySchemeName = pstlAdr.AdrTp.Prtry.SchmeNm
+	if pstlAdr.AdrTp != nil {
+		pa.AddressTypeCode = pstlAdr.AdrTp.Cd
+		if pstlAdr.AdrTp.Prtry != nil {
+			pa.AddressTypeProprietaryId = pstlAdr.AdrTp.Prtry.Id
+			pa.AddressTypeProprietaryIssuer = pstlAdr.AdrTp.Prtry.Issr
+			pa.AddressTypeProprietarySchemeName = pstlAdr.AdrTp.Prtry.SchmeNm
 		}
 	}
 
-	return &address
+	return &pa
+}
+
+func mapPaymentTypeInfo(pmtTpInf *isomodels.PmtTpInfPacs008) *models.PaymentTypeInfo {
+	if pmtTpInf == nil {
+		return nil
+	}
+
+	pmt := models.PaymentTypeInfo{
+		InstructionPriority: pmtTpInf.InstrPrty,
+		ClearingChannel:     pmtTpInf.ClrChanl,
+		ServiceLevel:        mapSvcLvl(pmtTpInf.SvcLvl),
+	}
+
+	if pmtTpInf.LclInstrm != nil {
+		pmt.LocalInstrumentCode = pmtTpInf.LclInstrm.Cd
+		pmt.LocalInstrumentProprietary = pmtTpInf.LclInstrm.Prtry
+	}
+	if pmtTpInf.CtgyPurp != nil {
+		pmt.CategoryPurposeCode = pmtTpInf.CtgyPurp.Cd
+		pmt.CategoryPurposeProprietary = pmtTpInf.CtgyPurp.Prtry
+	}
+
+	return &pmt
+}
+
+func mapSvcLvl(serviceLevel []*isomodels.SvcLvl) []*models.CodeOrProprietary {
+	var svcLvl []*models.CodeOrProprietary
+	for _, sl := range serviceLevel {
+		if sl != nil {
+			svcLvl = append(svcLvl, &models.CodeOrProprietary{
+				Code:        sl.Cd,
+				Proprietary: sl.Prtry,
+			})
+		}
+	}
+	return svcLvl
+}
+
+func mapSupplementaryData(splmtryData []*isomodels.SplmtryData) []*models.SupplementaryData {
+	var supplData []*models.SupplementaryData
+	for _, splData := range splmtryData {
+		if splData != nil {
+			supplData = append(supplData, &models.SupplementaryData{
+				PlaceAndName: splData.PlcAndNm,
+				Envelope:     splData.Envlp.Data,
+			})
+		}
+	}
+	return supplData
 }

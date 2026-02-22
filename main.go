@@ -1,19 +1,19 @@
 package main
 
 import (
-	"fmt"
+	"log"
 	// "os"
 	// "path/filepath"
 	"payment-simulator/internal/cache"
 	"payment-simulator/internal/config"
 	"payment-simulator/internal/db"
-	"payment-simulator/internal/routing"
+	"payment-simulator/internal/routing/incoming"
 	"payment-simulator/internal/validation"
 )
 
 func main() {
 	config := config.LoadConfig()
-	fmt.Println("Starting App in", config.ServiceMode, "Mode...")
+	log.Println("Starting App in", config.ServiceMode, "Mode...")
 	switch config.DBTECH {
 	case "mongodb":
 		db.ConnectMongo("mongodb://"+config.DBUSER+":"+config.DBPASS+"@"+config.DBURL+":"+config.DBPORT+"/"+config.DBNAME, config.DBNAME)
@@ -25,11 +25,6 @@ func main() {
 	validation.RegisterCustomValidations()
 	router := routing.RoutingSetup()
 
-	fmt.Println("Payments App Started on Port:", config.ServicePort)
+	log.Println("Payments App Started on Port:", config.ServicePort)
 	router.Run(":" + config.ServicePort)
 }
-
-// func ensureDir(path string) error {
-// 	dir := filepath.Dir(path)
-// 	return os.MkdirAll(dir, os.ModePerm)
-// }

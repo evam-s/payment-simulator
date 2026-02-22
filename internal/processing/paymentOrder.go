@@ -1,9 +1,12 @@
 package processing
 
 import (
+	"context"
 	"log"
 	"os"
 	"payment-simulator/internal/cache"
+	"payment-simulator/internal/db"
+	"payment-simulator/internal/models"
 	"strconv"
 	"time"
 )
@@ -34,5 +37,20 @@ func SetRecordForDupCheck(record, poNumber string) (bool, error) {
 	} else {
 		log.Println("Record for Duplicate Check Set:", res)
 		return res, nil
+	}
+}
+
+func createPaymentOrder(po *models.PaymentOrder) error {
+	po.EntityId = AssignPoNumber()
+	po.CreatedOn = time.Now()
+	contextBg := context.Background()
+	ctx, cancel := context.WithTimeout(contextBg, 5*time.Second)
+	defer cancel()
+	if res, err := db.DB.Collection("PaymentOrders").InsertOne(ctx, po); err != nil {
+		log.Println("Failed to Create Payment Order Entry:", err)
+		return err
+	} else {
+		log.Println("Payment Order Entry Created. Id:", res.InsertedID)
+		return nil
 	}
 }

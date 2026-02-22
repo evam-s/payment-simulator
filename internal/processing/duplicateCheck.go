@@ -25,7 +25,7 @@ func DuplicateCheck(po *models.PaymentOrder) (bool, error) {
 		return true, errors.New(errStr)
 	} else {
 		log.Println("PO is New.")
-		if _, err := SetRecordForDupCheck(dupCheckStr, po.EntityId); err != nil {
+		if _, err := SetRecordForDupCheck(dupCheckStr, po.Id); err != nil {
 			return false, err
 		} else {
 			return false, nil

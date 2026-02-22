@@ -27,7 +27,7 @@ func ConnectRedis(url, user, pass string) {
 		log.Printf("Connected to Redis at %s, with user %s", url, user)
 		if res, _ := RedisClient.Exists(ctx, "poNumber").Result(); res == 0 {
 			if res1, _ := RedisClient.Set(ctx, "poNumber", -1, 0).Result(); res1 == "OK" {
-				log.Println("PO Number Base Initialised: ", res1)
+				log.Println("PO Number Base Initialised:", res1)
 			}
 		}
 	}
