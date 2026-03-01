@@ -2,8 +2,6 @@ package main
 
 import (
 	"log"
-	// "os"
-	// "path/filepath"
 	"payment-simulator/internal/cache"
 	"payment-simulator/internal/config"
 	"payment-simulator/internal/db"

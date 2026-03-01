@@ -3,9 +3,6 @@ package routing
 import (
 	"bytes"
 	"context"
-	"github.com/gin-gonic/gin"
-	"github.com/matoous/go-nanoid/v2"
-	"go.mongodb.org/mongo-driver/bson"
 	"io"
 	"log"
 	"net/http"
@@ -14,6 +11,10 @@ import (
 	"payment-simulator/internal/processing"
 	"strings"
 	"time"
+
+	"github.com/gin-gonic/gin"
+	"github.com/matoous/go-nanoid/v2"
+	"go.mongodb.org/mongo-driver/bson"
 )
 
 func RoutingSetup() *gin.Engine {
@@ -45,7 +46,7 @@ func RoutingSetup() *gin.Engine {
 			"expectedType": "pacs008",
 			"route":        "incoming",
 			"asIsMsg":      string(bodyBytes),
-			"receivedAt":  time.Now(),
+			"receivedAt":   time.Now(),
 		}); err != nil {
 			log.Println("Failed to log raw payload:", err)
 		} else {
@@ -67,7 +68,7 @@ func RoutingSetup() *gin.Engine {
 			update := bson.M{"$set": bson.M{"transformedXml": isoPacs, "actualType": strings.Split(isoPacs.Xmlns, "xsd:")[1]}}
 			db.DB.Collection("MessageLogger").UpdateByID(ctx1, id, update)
 
-			if err := processing.ProcessInboundPo(isoPacs, id, headers); err != nil {
+			if err := processing.ProcessInboundPo(isoPacs, id, headers.Get("X-TESTING-CALLBACK-URL")); err != nil {
 				if strings.HasPrefix(err.Error(), "Failed to bind XML") {
 					c.JSON(400, gin.H{"ErrorMessage": err})
 				} else {

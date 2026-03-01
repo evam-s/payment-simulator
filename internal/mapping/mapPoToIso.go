@@ -3,9 +3,10 @@ package mapping
 import (
 	"crypto/sha256"
 	"encoding/hex"
-	"github.com/matoous/go-nanoid/v2"
 	"payment-simulator/internal/iso20022/isomodels"
 	"payment-simulator/internal/models"
+
+	"github.com/matoous/go-nanoid/v2"
 )
 
 func MapToPacs002(pos []*models.PaymentOrder, status map[string]string) *isomodels.Pacs002 {

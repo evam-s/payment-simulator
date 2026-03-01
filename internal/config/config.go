@@ -50,7 +50,7 @@ func LoadConfig() Config {
 }
 
 func getEnv(key, fallback string) string {
-	if value, exists := os.LookupEnv(key); exists {
+	if value, exists := os.LookupEnv(key); exists && len(value) > 0 {
 		log.Printf("Found env var %s=%s", key, value)
 		return value
 	}

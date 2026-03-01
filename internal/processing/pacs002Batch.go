@@ -20,7 +20,7 @@ import (
 var ctx = context.Background()
 
 func init() {
-	ticker := time.NewTicker(1 * time.Second)
+	ticker := time.NewTicker(1 * time.Minute)
 	go func() {
 		for range ticker.C {
 			if oldSnapshotKeys, err := hasOldSnapshots(); err != nil {
@@ -109,7 +109,7 @@ func ProcessSnapshot(snapshotKey string) error {
 			return fmt.Errorf("Failed to generate PACS002 XML, Error: %w", err)
 		} else {
 			xmlWithHeader := []byte(xml.Header + string(xmlBytes))
-			if err := routing.SendPacs002Out(string(xmlWithHeader), "http://localhost:8081/pacs002"); err != nil {
+			if err := routing.SendPacs002Out(string(xmlWithHeader), Pacs002CallbackUrl); err != nil {
 				log.Println("Error in PACS002 Posting:", err)
 				return fmt.Errorf("Error in PACS002 Posting: %w", err)
 			} else {
@@ -129,6 +129,41 @@ func ProcessSnapshot(snapshotKey string) error {
 				}
 				return nil
 			}
+		}
+	}
+}
+
+func CreatePacs002ForSinglePo(po *models.PaymentOrder, status string) error {
+	pacs002Id, _ := gonanoid.New(12)
+	pacs002 := mapping.MapToPacs002(append([]*models.PaymentOrder{}, po), map[string]string{po.TransactionId: status})
+	pacs002.FIToFIPmtStsRpt.GrpHdr.MsgId = pacs002Id
+	pacs002.FIToFIPmtStsRpt.GrpHdr.CreDtTm = time.Now().Format("2026-01-29T06:16:00Z")
+	pacs002.Xmlns = "urn:iso:std:iso:20022:tech:xsd:pacs.002.001.15"
+	pacs002.XmlnsXsi = "http://www.w3.org/2001/XMLSchema-instance"
+	pacs002.SchemaLocation = pacs002.Xmlns + " schema.xsd"
+
+	if xmlBytes, err := xml.Marshal(pacs002); err != nil {
+		log.Println("Failed to generate PACS002 XML, Error:", err)
+		return fmt.Errorf("Failed to generate PACS002 XML, Error: %w", err)
+	} else {
+		xmlWithHeader := []byte(xml.Header + string(xmlBytes))
+		if err := routing.SendPacs002Out(string(xmlWithHeader), Pacs002CallbackUrl); err != nil {
+			log.Println("Error in PACS002 Posting:", err, " for PoId:", po.Id)
+			return fmt.Errorf("Error in PACS002 Posting: %w for PoId: %v", err, po.Id)
+		} else {
+			log.Println("PACS002 for all PoId:", po.Id, "Sent.")
+			if res, err := db.DB.Collection("MessageLogger").InsertOne(ctx, map[string]any{
+				"_id":        pacs002Id,
+				"actualType": strings.Split(pacs002.Xmlns, "xsd:")[1],
+				"route":      "outgoing",
+				"asIsMsg":    string(xmlWithHeader),
+				"createdAt":  time.Now(),
+			}); err != nil {
+				log.Println("There was some error in creating MessageLogger entry for PACS002 Out:", pacs002Id)
+			} else {
+				log.Println("MessageLogger entry for PACS002 Out created:", res)
+			}
+			return nil
 		}
 	}
 }

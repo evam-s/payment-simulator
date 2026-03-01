@@ -1,11 +1,12 @@
 package mapping
 
 import (
-	"github.com/gin-gonic/gin"
 	"log"
 	"payment-simulator/internal/iso20022/isomodels"
 	"payment-simulator/internal/models"
 	"strings"
+
+	"github.com/gin-gonic/gin"
 )
 
 func MapXmlPacs008(c *gin.Context) (*isomodels.Pacs008, error) {
