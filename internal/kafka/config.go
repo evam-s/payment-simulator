@@ -17,7 +17,7 @@ var kafkaCfg KafkaConfig
 
 func init() {
 	kc := KafkaConfig{}
-	kc.Brokers = strings.Split(getEnv("KAFKA_BROKERS", "localhost:9092"), ",")
+	kc.Brokers = strings.Split(getEnv("KAFKA_BROKERS", "localhost:29092"), ",") // default port is 9092
 	dfltPart := getEnv("KAFKA_DEFAULT_PARTITIONS", "3")
 	dfltRepl := getEnv("KAFKA_REPLICATION_FACTOR", "1")
 

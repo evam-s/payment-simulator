@@ -3,6 +3,7 @@ module payment-simulator
 go 1.25.6
 
 require (
+	github.com/fsnotify/fsnotify v1.9.0
 	github.com/gin-gonic/gin v1.11.0
 	github.com/go-playground/validator/v10 v10.27.0
 	github.com/matoous/go-nanoid/v2 v2.1.0

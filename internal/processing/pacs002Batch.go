@@ -33,7 +33,9 @@ func init() {
 				}
 			} else {
 				if snapshotKey, err := SnapshotBatch(); err != nil {
-					log.Println("Failed to take a snapshot of Batch:", err)
+					if err.Error() != "ERR no such key" {
+						log.Println("Failed to take a snapshot of Batch:", err)
+					}
 				} else {
 					if err1 := ProcessSnapshot(snapshotKey); err1 != nil {
 						log.Println("There was some error in Processing the PACS002 Batch for Key", snapshotKey, ", Error:", err1)
@@ -58,6 +60,9 @@ func AddPoToPacs002Batch(po string) error {
 func SnapshotBatch() (string, error) {
 	snapshotName := "PACS002BATCH_" + time.DateTime
 	if err := cache.RedisClient.Rename(ctx, "PACS002BATCH", snapshotName).Err(); err != nil {
+		if strings.Contains(err.Error(), "ERR no such key") {
+			return "", fmt.Errorf("ERR no such key")
+		}
 		log.Println("Failed to rename batch:", err)
 		return "", fmt.Errorf("Failed to rename batch: %w", err)
 	} else {
@@ -70,7 +75,9 @@ func hasOldSnapshots() ([]string, error) {
 		log.Println("Failed to fetch snapshot keys:", err)
 		return nil, fmt.Errorf("Failed to fetch snapshot keys: %w", err)
 	} else {
-		log.Println("Snapshot keys fetched:", keys)
+		if len(keys) > 0 {
+			log.Println("Found Old PACS002 snapshots pending for processing:", keys)
+		}
 		return keys, nil
 	}
 }
@@ -151,7 +158,7 @@ func CreatePacs002ForSinglePo(po *models.PaymentOrder, status string) error {
 			log.Println("Error in PACS002 Posting:", err, " for PoId:", po.Id)
 			return fmt.Errorf("Error in PACS002 Posting: %w for PoId: %v", err, po.Id)
 		} else {
-			log.Println("PACS002 for all PoId:", po.Id, "Sent.")
+			log.Println("PACS002", pacs002Id, "for TransactionId:", po.Id, "Sent.")
 			if res, err := db.DB.Collection("MessageLogger").InsertOne(ctx, map[string]any{
 				"_id":        pacs002Id,
 				"actualType": strings.Split(pacs002.Xmlns, "xsd:")[1],

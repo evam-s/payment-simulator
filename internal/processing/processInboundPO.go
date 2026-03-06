@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-var Pacs002CallbackUrl string
+var Pacs002CallbackUrl string // no point in setting after rcvng a pacs008. on restart this will be empty till we get a new one
 
 func ProcessInboundPo(isoPacs *isomodels.Pacs008, id, callBackUrl string) error {
 	Pacs002CallbackUrl = callBackUrl
@@ -39,14 +39,19 @@ func ProcessInboundPo(isoPacs *isomodels.Pacs008, id, callBackUrl string) error 
 			CreateEventLog(models.EventLog{
 				ReqId:       po.Id,
 				EventId:     "POVALCOMP",
-				EventRemark: "Payment Order is Duplicate. Rejected.",
+				EventRemark: "Payment Order is Duplicate. Rejected",
 			})
 
 			if err1 := CreatePacs002ForSinglePo(po, "RJCT"); err1 != nil {
 				log.Println("There was some error in Posting RJCT PACS002 for PO", po.EntityId, ", Error:", err1)
 				return fmt.Errorf("There was some error in Posting RJCT PACS002 for TxId %v, Error: %w", po.TransactionId, err1)
-
 			}
+
+			CreateEventLog(models.EventLog{
+				ReqId:       po.Id,
+				EventId:     "PACS002SENT",
+				EventRemark: "PACS002 RJCT is sent",
+			})
 		} else {
 			if err != nil {
 				log.Println("There was some error in Checking if PO", po.EntityId, "is Duplicate:", err)
