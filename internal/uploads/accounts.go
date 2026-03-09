@@ -31,4 +31,23 @@ func ConsumeFromAccountsTopic() {
 	}
 }
 
+func ConsumeFromBanksTopic() {
+	banksChan := make(chan kafka.KafkaMsg)
+	go kafka.ConsumeFromTopic("banks", banksChan)
+	for bankMsg := range banksChan {
+		log.Println("msg from banks Q", string(bankMsg.Value))
+		var bank reference.Bank
+		json.Unmarshal(bankMsg.Value, &bank)
+		log.Println("json from Q", bank)
+
+		ctx, cancel := context.WithTimeout(ctxBg, 5*time.Second)
+		if res, err := db.DB.Collection("Banks").InsertOne(ctx, bank); err != nil {
+			log.Println("There was some error in Creating Bank:", bank, ", Error:", err)
+		} else {
+			log.Println("New Bank entry created:", res)
+		}
+		cancel()
+	}
+}
+
 // Id,Name,PhoneNumber,Email,Address,Balance,Currency,Active

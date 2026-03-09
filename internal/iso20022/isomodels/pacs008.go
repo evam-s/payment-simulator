@@ -1,6 +1,9 @@
 package isomodels
 
+import "encoding/xml"
+
 type Pacs008 struct {
+	XMLName           xml.Name           `xml:"Document"`
 	Xmlns             string             `xml:"xmlns,attr"`
 	SchemaLocation    string             `xml:"schemaLocation,attr"`
 	XmlnsXsi          string             `xml:"xsi,attr"`
@@ -18,7 +21,7 @@ type GrpHdrPacs008 struct {
 	CreDtTm           string           `xml:"CreDtTm" json:"creationDateTime" binding:"required,isoDateTime"`
 	NbOfTxs           string           `xml:"NbOfTxs" json:"numberOfTxs" binding:"required,numeric,omitempty,min=1,max=15"`
 	SttlmInf          *SttlmInf        `xml:"SttlmInf" json:"settlementInfo" binding:"required"`
-	XpryDtTm          string           `xml:"XpryDtTm,omitempty" json:"expiryDateTime,omitempty" binding:"required,isoDateTime"`
+	XpryDtTm          string           `xml:"XpryDtTm,omitempty" json:"expiryDateTime,omitempty" binding:"omitempty,isoDateTime"`
 	BtchBookg         bool             `xml:"BtchBookg,omitempty" json:"batchBooking,omitempty"`
 	CtrlSum           float64          `xml:"CtrlSum,omitempty" json:"controlSum,omitempty"`
 	TtlIntrBkSttlmAmt *Amount          `xml:"TtlIntrBkSttlmAmt,omitempty" json:"totalSettlementAmount,omitzero"`
@@ -76,7 +79,7 @@ type Agent struct {
 type FinInstnId struct {
 	BICFI       string        `xml:"BICFI,omitempty" json:"bicfi,omitempty" binding:"regexp=^[A-Z0-9]{4}[A-Z]{2}[A-Z0-9]{2}([A-Z0-9]{3})?$"`
 	ClrSysMmbId *ClrSysMmbId  `xml:"ClrSysMmbId,omitempty" json:"clearingSystemMemberId,omitzero"`
-	LEI         string        `xml:"LEI,omitempty" json:"lei,omitempty" binding:"regexp=^[A-Z0-9]{18}[0-9]{2}$"`
+	LEI         string        `xml:"LEI,omitempty" json:"lei,omitempty" binding:"omitempty,regexp=^[A-Z0-9]{18}[0-9]{2}$"`
 	Nm          string        `xml:"Nm,omitempty" json:"name,omitempty" binding:"max=140"`
 	PstlAdr     *PstlAdr      `xml:"PstlAdr,omitempty" json:"postalAddress,omitzero"`
 	Othr        *FinInstnOthr `xml:"Othr,omitempty" json:"other,omitzero"`
@@ -143,7 +146,7 @@ type CdtTrfTxInf struct {
 	InstrForCdtrAgt   []*InstrForCdtrAgt `xml:"InstrForCdtrAgt,omitempty" json:"instructionsForCreditorAgent,omitempty" binding:"dive"`
 	InstrForNxtAgt    []*InstrForNxtAgt  `xml:"InstrForNxtAgt,omitempty" json:"instructionsForNextAgent,omitempty" binding:"dive"`
 	Purp              *Purp              `xml:"Purp,omitempty" json:"purpose,omitzero"`
-	RgltryRptg        []RgltryRptg       `xml:"RgltryRptg,omitempty" json:"regulatoryReporting,omitempty" binding:"max=10,dive"`
+	RgltryRptg        []*RgltryRptg      `xml:"RgltryRptg,omitempty" json:"regulatoryReporting,omitempty" binding:"max=10,dive"`
 	Tax               *Tax               `xml:"Tax,omitempty" json:"tax,omitzero"`
 	RltdRmtInf        []*RltdRmtInf      `xml:"RltdRmtInf,omitempty" json:"relatedRemittanceInfo,omitempty" binding:"dive"`
 	RmtInf            *RmtInf            `xml:"RmtInf,omitempty" json:"remittanceInfo,omitzero"`
@@ -260,8 +263,8 @@ type Party struct {
 	Nm        string    `xml:"Nm,omitempty" json:"name,omitempty" binding:"required"`
 	PstlAdr   *PstlAdr  `xml:"PstlAdr,omitempty" json:"postalAddress,omitzero"`
 	Id        *PartyId  `xml:"Id,omitempty" json:"partyId,omitzero"`
-	CtryOfRes string    `xml:"CtryOfRes,omitempty" json:"countryOfResidence,omitempty" binding:"regexp=^[A-Z]{2}$"`
-	CtctDtls  *CtctDtls `xml:"CtctDtls,omitempty" json:"contactDetails,omitzero" binding:"required"`
+	CtryOfRes string    `xml:"CtryOfRes,omitempty" json:"countryOfResidence,omitempty" binding:"omitempty,regexp=^[A-Z]{2}$"`
+	CtctDtls  *CtctDtls `xml:"CtctDtls,omitempty" json:"contactDetails,omitzero"`
 }
 
 type FinInstnOthr struct {
@@ -292,7 +295,7 @@ type PstlAdr struct {
 	TwnLctnNm   string `xml:"TwnLctnNm,omitempty" json:"townLocationName,omitempty" binding:"max=140"`
 	DstrctNm    string `xml:"DstrctNm,omitempty" json:"districtName,omitempty" binding:"max=140"`
 	CtrySubDvsn string `xml:"CtrySubDvsn,omitempty" json:"countrySubdivision,omitempty" binding:"max=35"`
-	Ctry        string `xml:"Ctry,omitempty" json:"country,omitempty" binding:"regexp=^[A-Z]{2}$"`
+	Ctry        string `xml:"Ctry,omitempty" json:"country,omitempty" binding:"omitempty,regexp=^[A-Z]{2}$"`
 	AdrLine     string `xml:"AdrLine,omitempty" json:"addressLine,omitempty" binding:"max=70"`
 }
 

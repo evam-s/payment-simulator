@@ -32,20 +32,24 @@ func init() {
 					}
 				}
 			} else {
-				if snapshotKey, err := SnapshotBatch(); err != nil {
-					if err.Error() != "ERR no such key" {
-						log.Println("Failed to take a snapshot of Batch:", err)
-					}
-				} else {
-					if err1 := ProcessSnapshot(snapshotKey); err1 != nil {
-						log.Println("There was some error in Processing the PACS002 Batch for Key", snapshotKey, ", Error:", err1)
-					} else {
-						log.Println(snapshotKey, "processed.")
-					}
-				}
+				TriggerPacs002Batch()
 			}
 		}
 	}()
+}
+
+func TriggerPacs002Batch() {
+	if snapshotKey, err := SnapshotBatch(); err != nil {
+		if err.Error() != "ERR no such key" {
+			log.Println("Failed to take a snapshot of Batch:", err)
+		}
+	} else {
+		if err1 := ProcessSnapshot(snapshotKey); err1 != nil {
+			log.Println("There was some error in Processing the PACS002 Batch for Key", snapshotKey, ", Error:", err1)
+		} else {
+			log.Println(snapshotKey, "processed.")
+		}
+	}
 }
 
 func AddPoToPacs002Batch(po string) error {
@@ -58,7 +62,7 @@ func AddPoToPacs002Batch(po string) error {
 }
 
 func SnapshotBatch() (string, error) {
-	snapshotName := "PACS002BATCH_" + time.DateTime
+	snapshotName := "PACS002BATCH_" + time.Now().Format(time.DateTime)
 	if err := cache.RedisClient.Rename(ctx, "PACS002BATCH", snapshotName).Err(); err != nil {
 		if strings.Contains(err.Error(), "ERR no such key") {
 			return "", fmt.Errorf("ERR no such key")
@@ -98,15 +102,16 @@ func ProcessSnapshot(snapshotKey string) error {
 			log.Println("Failed to fetch Payment Orders for", pos, ":", err)
 			return fmt.Errorf("Failed to fetch Payment Orders for %v: %w", pos, err)
 		}
+
 		statusMap := make(map[string]string)
 		for _, po := range poData {
 			statusMap[po.TransactionId] = po.Status
 		}
 
 		pacs002Id, _ := gonanoid.New(12)
-		pacs002 := mapping.MapToPacs002(poData, statusMap)
+		pacs002, stsIdMap := mapping.MapToPacs002(poData, statusMap)
 		pacs002.FIToFIPmtStsRpt.GrpHdr.MsgId = pacs002Id
-		pacs002.FIToFIPmtStsRpt.GrpHdr.CreDtTm = time.Now().Format("2026-01-29T06:16:00Z")
+		pacs002.FIToFIPmtStsRpt.GrpHdr.CreDtTm = time.Now().Format(time.RFC3339)
 		pacs002.Xmlns = "urn:iso:std:iso:20022:tech:xsd:pacs.002.001.15"
 		pacs002.XmlnsXsi = "http://www.w3.org/2001/XMLSchema-instance"
 		pacs002.SchemaLocation = pacs002.Xmlns + " schema.xsd"
@@ -133,6 +138,15 @@ func ProcessSnapshot(snapshotKey string) error {
 					log.Println("There was some error in creating MessageLogger entry for PACS002 Out:", pacs002Id)
 				} else {
 					log.Println("MessageLogger entry for PACS002 Out created:", res)
+
+					for _, po := range poData {
+						CreateEventLog(models.EventLog{
+							ReqId:       po.Id,
+							EntityId:    po.EntityId,
+							EventId:     "PACS002" + statusMap[po.TransactionId],
+							EventRemark: "PACS002 " + statusMap[po.TransactionId] + " Sent Out, MsgId:" + pacs002Id + ", StsId:" + stsIdMap[po.TransactionId],
+						})
+					}
 				}
 				return nil
 			}
@@ -142,9 +156,9 @@ func ProcessSnapshot(snapshotKey string) error {
 
 func CreatePacs002ForSinglePo(po *models.PaymentOrder, status string) error {
 	pacs002Id, _ := gonanoid.New(12)
-	pacs002 := mapping.MapToPacs002(append([]*models.PaymentOrder{}, po), map[string]string{po.TransactionId: status})
+	pacs002, stsIdMap := mapping.MapToPacs002(append([]*models.PaymentOrder{}, po), map[string]string{po.TransactionId: status})
 	pacs002.FIToFIPmtStsRpt.GrpHdr.MsgId = pacs002Id
-	pacs002.FIToFIPmtStsRpt.GrpHdr.CreDtTm = time.Now().Format("2026-01-29T06:16:00Z")
+	pacs002.FIToFIPmtStsRpt.GrpHdr.CreDtTm = time.Now().Format(time.RFC3339)
 	pacs002.Xmlns = "urn:iso:std:iso:20022:tech:xsd:pacs.002.001.15"
 	pacs002.XmlnsXsi = "http://www.w3.org/2001/XMLSchema-instance"
 	pacs002.SchemaLocation = pacs002.Xmlns + " schema.xsd"
@@ -169,6 +183,13 @@ func CreatePacs002ForSinglePo(po *models.PaymentOrder, status string) error {
 				log.Println("There was some error in creating MessageLogger entry for PACS002 Out:", pacs002Id)
 			} else {
 				log.Println("MessageLogger entry for PACS002 Out created:", res)
+
+				CreateEventLog(models.EventLog{
+					ReqId:       po.Id,
+					EntityId:    po.EntityId,
+					EventId:     "PACS002" + status,
+					EventRemark: "PACS002 " + status + " Sent Out, MsgId:" + pacs002Id + ", StsId:" + stsIdMap[po.TransactionId],
+				})
 			}
 			return nil
 		}

@@ -12,11 +12,12 @@ import (
 )
 
 func InitializeFolderWatcher() {
-	watchFolder("bucket/accounts")
+	watchFolder("bucket/banks", "banks")
+	watchFolder("bucket/accounts", "accounts")
 	log.Println("All FW initialized.")
 }
 
-func watchFolder(path string) {
+func watchFolder(path, topicName string) {
 	cwd, _ := os.Getwd()
 	path = filepath.Join(cwd, path)
 	watcher, err := fsnotify.NewWatcher()
@@ -49,7 +50,7 @@ func watchFolder(path string) {
 
 					debounce = time.AfterFunc(time.Second, func() {
 						log.Println("Event.name:", event.Name)
-						readFile(event.Name)
+						readFile(event.Name, topicName)
 					})
 				}
 
@@ -63,7 +64,7 @@ func watchFolder(path string) {
 	}()
 }
 
-func readFile(fileName string) {
+func readFile(fileName, topic string) {
 	if fileData, err := os.ReadFile(fileName); err != nil {
 		log.Println("There was some error in reading file", fileName, ", Error:", err)
 	} else {
@@ -77,7 +78,7 @@ func readFile(fileName string) {
 			val, _ := json.Marshal(record)
 			goLimiter <- 1
 			go func(v []byte) {
-				kafka.PublishToTopic(v, "accounts")
+				kafka.PublishToTopic(v, topic)
 				<-goLimiter
 			}(val)
 		}

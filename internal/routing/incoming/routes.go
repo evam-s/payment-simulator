@@ -75,7 +75,8 @@ func RoutingSetup() *gin.Engine {
 					c.JSON(503, gin.H{"ErrorMessage": err})
 				}
 			} else {
-				c.JSON(200, gin.H{"PO": *isoPacs})
+				// c.JSON(200, gin.H{"PO": *isoPacs})
+				c.XML(200, *isoPacs)
 			}
 		}
 	})

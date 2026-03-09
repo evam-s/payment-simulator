@@ -3,15 +3,15 @@ package isomodels
 import "encoding/xml"
 
 type Pacs002 struct {
-	XMLName         xml.Name        `xml:"Document"`
-	Xmlns           string          `xml:"xmlns,attr"`
-	SchemaLocation  string          `xml:"schemaLocation,attr"`
-	XmlnsXsi        string          `xml:"xsi,attr"`
-	FIToFIPmtStsRpt FIToFIPmtStsRpt `xml:"FIToFIPmtStsRpt" binding:"required"`
+	XMLName         xml.Name         `xml:"Document"`
+	Xmlns           string           `xml:"xmlns,attr"`
+	SchemaLocation  string           `xml:"schemaLocation,attr"`
+	XmlnsXsi        string           `xml:"xsi,attr"`
+	FIToFIPmtStsRpt *FIToFIPmtStsRpt `xml:"FIToFIPmtStsRpt" binding:"required"`
 }
 
 type FIToFIPmtStsRpt struct {
-	GrpHdr            GrpHdrPacs002        `xml:"GrpHdr" binding:"required"`
+	GrpHdr            *GrpHdrPacs002       `xml:"GrpHdr" binding:"required"`
 	OrgnlGrpInfAndSts []*OrgnlGrpInfAndSts `xml:"OrgnlGrpInfAndSts,omitempty" binding:"dive"`
 	TxInfAndSts       []*TxInfAndSts       `xml:"TxInfAndSts,omitempty" binding:"dive"`
 	SplmtryData       []*SplmtryData       `xml:"SplmtryData,omitempty" binding:"omitempty,dive"`

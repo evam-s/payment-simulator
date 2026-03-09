@@ -31,3 +31,20 @@ type AccountAddress struct {
 	Country            string `json:"country"`
 	AddressLine        string `json:"addressLine"`
 }
+
+type Bank struct {
+	Id       string    `json:"id" bson:"_id"`
+	Name     string    `json:"name"`
+	BIC      string    `json:"bic"`
+	Country  string    `json:"country"`
+	Balance  int       `json:"balance"`
+	Active   bool      `json:"active"`
+	Branches []*Branch `json:"branches"`
+}
+
+type Branch struct {
+	Id          string          `json:"id"`
+	Name        string          `json:"name"`
+	PhoneNumber string          `json:"phoneNumber"`
+	Address     *AccountAddress `json:"address"`
+}

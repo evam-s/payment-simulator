@@ -16,10 +16,6 @@ var ctxBg = context.Background()
 type KafkaMsg = kafka.Message
 
 func NewWriter() *kafka.Writer {
-	// if err := EnsureTopicExists(topic); err != nil {
-	// 	return nil
-	// }
-
 	return &kafka.Writer{
 		Addr:                   kafka.TCP(kafkaCfg.Brokers...),
 		Balancer:               &kafka.LeastBytes{},
@@ -92,7 +88,6 @@ func PublishToTopic(data []byte, topic string) {
 
 func ConsumeFromTopic(topic string, topicChan chan<- kafka.Message) {
 	reader := NewReader(topic)
-	log.Println("reader", reader)
 	defer reader.Close()
 	for {
 		if msg, err := reader.ReadMessage(ctxBg); err != nil {

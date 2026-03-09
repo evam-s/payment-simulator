@@ -25,58 +25,72 @@ func MapPacs008ToPo(isoPacs *isomodels.Pacs008) (error, *models.PaymentOrder) {
 	txn := isoPacs.FIToFICstmrCdtTrf.CdtTrfTxInf[0]
 	var charges []*models.Charges
 	for _, ch := range txn.ChrgsInf {
-		chg := models.Charges{
-			Amount: mapAmount(ch.Amt),
-			Agent:  mapIsoAgent(ch.Agt),
-		}
-		if ch.Tp != nil {
-			chg.Type = &models.ChrgsTp{}
-			chg.Type.Code = ch.Tp.Cd
-			if ch.Tp.Prtry != nil {
-				chg.Type.ProprietaryId = ch.Tp.Prtry.Id
-				chg.Type.ProprietaryIssuer = ch.Tp.Prtry.Issr
+		if ch != nil {
+			chg := models.Charges{
+				Amount: mapAmount(ch.Amt),
+				Agent:  mapIsoAgent(ch.Agt),
 			}
+			if ch.Tp != nil {
+				chg.Type = &models.ChrgsTp{}
+				chg.Type.Code = ch.Tp.Cd
+				if ch.Tp.Prtry != nil {
+					chg.Type.ProprietaryId = ch.Tp.Prtry.Id
+					chg.Type.ProprietaryIssuer = ch.Tp.Prtry.Issr
+				}
+			}
+			charges = append(charges, &chg)
 		}
-		charges = append(charges, &chg)
 	}
 
 	po = models.PaymentOrder{
-		Debtor:                     mapIsoParty(txn.Dbtr),
-		UltimateDebtor:             mapIsoParty(txn.UltmtDbtr),
-		DebtorAcct:                 mapIsoAccount(txn.DbtrAcct),
-		DebtorAgent:                mapIsoAgent(txn.DbtrAgt),
-		DebtorAgentAcct:            mapIsoAccount(txn.DbtrAgtAcct),
-		Creditor:                   mapIsoParty(txn.Cdtr),
-		UltimateCreditor:           mapIsoParty(txn.UltmtCdtr),
-		CreditorAcct:               mapIsoAccount(txn.CdtrAcct),
-		CreditorAgent:              mapIsoAgent(txn.CdtrAgt),
-		CreditorAgentAcct:          mapIsoAccount(txn.CdtrAgtAcct),
-		SettlementAmount:           mapAmount(txn.IntrBkSttlmAmt),
-		InstructionId:              txn.PmtId.InstrId,
-		TransactionId:              txn.PmtId.TxId,
-		EndToEndId:                 txn.PmtId.EndToEndId,
-		UETR:                       txn.PmtId.UETR,
-		ClearingSystemReference:    txn.PmtId.ClrSysRef,
-		MessageId:                  grpHdr.MsgId,
-		MessageNameId:              strings.Split(isoPacs.Xmlns, "xsd:")[1],
-		CreationDateTime:           grpHdr.CreDtTm,
-		NumberOfTxs:                grpHdr.NbOfTxs,
-		SettlementMethod:           grpHdr.SttlmInf.SttlmMtd,
-		SettlementAcct:             mapIsoAccount(grpHdr.SttlmInf.SttlmAcct),
-		ControlSum:                 grpHdr.CtrlSum,
-		SettlementDate:             txn.IntrBkSttlmDt,
-		SettlementPriority:         txn.SttlmPrty,
-		UnstructuredRemittanceInfo: txn.RmtInf.Ustrd,
-		PurposeCode:                txn.Purp.Cd,
-		PurposeProprietary:         txn.Purp.Prtry,
-		ChargeBearer:               txn.ChrgBr,
-		Charges:                    charges,
-		PaymentTypeInfo:            mapPaymentTypeInfo(txn.PmtTpInf),
-		HeaderPaymentTypeInfo:      mapPaymentTypeInfo(grpHdr.PmtTpInf),
-		SupplementaryData:          mapSupplementaryData(txn.SplmtryData),
-		HeaderSupplementaryData:    mapSupplementaryData(isoPacs.FIToFICstmrCdtTrf.SplmtryData),
+		Debtor:                  mapIsoParty(txn.Dbtr),
+		UltimateDebtor:          mapIsoParty(txn.UltmtDbtr),
+		DebtorAcct:              mapIsoAccount(txn.DbtrAcct),
+		DebtorAgent:             mapIsoAgent(txn.DbtrAgt),
+		DebtorAgentAcct:         mapIsoAccount(txn.DbtrAgtAcct),
+		Creditor:                mapIsoParty(txn.Cdtr),
+		UltimateCreditor:        mapIsoParty(txn.UltmtCdtr),
+		CreditorAcct:            mapIsoAccount(txn.CdtrAcct),
+		CreditorAgent:           mapIsoAgent(txn.CdtrAgt),
+		CreditorAgentAcct:       mapIsoAccount(txn.CdtrAgtAcct),
+		SettlementAmount:        mapAmount(txn.IntrBkSttlmAmt),
+		MessageId:               grpHdr.MsgId,
+		MessageNameId:           strings.Split(isoPacs.Xmlns, "xsd:")[1],
+		CreationDateTime:        grpHdr.CreDtTm,
+		NumberOfTxs:             grpHdr.NbOfTxs,
+		ControlSum:              grpHdr.CtrlSum,
+		SettlementDate:          txn.IntrBkSttlmDt,
+		SettlementPriority:      txn.SttlmPrty,
+		ChargeBearer:            txn.ChrgBr,
+		Charges:                 charges,
+		PaymentTypeInfo:         mapPaymentTypeInfo(txn.PmtTpInf),
+		HeaderPaymentTypeInfo:   mapPaymentTypeInfo(grpHdr.PmtTpInf),
+		SupplementaryData:       mapSupplementaryData(txn.SplmtryData),
+		HeaderSupplementaryData: mapSupplementaryData(isoPacs.FIToFICstmrCdtTrf.SplmtryData),
 		// ReferenceNumber :
 		// TotalTaxAmount
+	}
+
+	if txn.PmtId != nil {
+		po.UETR = txn.PmtId.UETR
+		po.InstructionId = txn.PmtId.InstrId
+		po.TransactionId = txn.PmtId.TxId
+		po.EndToEndId = txn.PmtId.EndToEndId
+		po.ClearingSystemReference = txn.PmtId.ClrSysRef
+	}
+
+	if grpHdr.SttlmInf != nil {
+		po.SettlementMethod = grpHdr.SttlmInf.SttlmMtd
+		po.SettlementAcct = mapIsoAccount(grpHdr.SttlmInf.SttlmAcct)
+	}
+
+	if txn.RmtInf != nil {
+		po.UnstructuredRemittanceInfo = txn.RmtInf.Ustrd
+	}
+
+	if txn.Purp != nil {
+		po.PurposeCode = txn.Purp.Cd
+		po.PurposeProprietary = txn.Purp.Prtry
 	}
 
 	// x, _ := json.MarshalIndent(po, "", "  ")
@@ -100,23 +114,42 @@ func mapIsoAgent(agent *isomodels.Agent) *models.Agent {
 		return nil
 	}
 
-	return &models.Agent{
-		FiiBicfi:                       agent.FinInstnId.BICFI,
-		FiiClearingSystemIdCode:        agent.FinInstnId.ClrSysMmbId.ClrSysId.Cd,
-		FiiClearingSystemIdProprietary: agent.FinInstnId.ClrSysMmbId.ClrSysId.Prtry,
-		FiiMemberId:                    agent.FinInstnId.ClrSysMmbId.MmbId,
-		FiiLei:                         agent.FinInstnId.LEI,
-		FiiName:                        agent.FinInstnId.Nm,
-		FiiPostalAddress:               mapPostalAddress(agent.FinInstnId.PstlAdr),
-		FiiOtherId:                     agent.FinInstnId.Othr.Id,
-		FiiOtherIssuer:                 agent.FinInstnId.Othr.Issr,
-		FiiOtherSchemeNameCode:         agent.FinInstnId.Othr.SchmeNm.Cd,
-		FiiOtherSchemeNameProprietary:  agent.FinInstnId.Othr.SchmeNm.Prtry,
-		BiId:                           agent.BrnchId.Id,
-		BiLei:                          agent.BrnchId.LEI,
-		BiName:                         agent.BrnchId.Nm,
-		BiPostalAddress:                mapPostalAddress(agent.BrnchId.PstlAdr),
+	agt := models.Agent{}
+
+	if agent.FinInstnId != nil {
+		agt.FiiLei = agent.FinInstnId.LEI
+		agt.FiiName = agent.FinInstnId.Nm
+		agt.FiiBicfi = agent.FinInstnId.BICFI
+		agt.FiiPostalAddress = mapPostalAddress(agent.FinInstnId.PstlAdr)
+
+		if agent.FinInstnId.ClrSysMmbId != nil {
+			agt.FiiMemberId = agent.FinInstnId.ClrSysMmbId.MmbId
+
+			if agent.FinInstnId.ClrSysMmbId.ClrSysId != nil {
+				agt.FiiClearingSystemIdCode = agent.FinInstnId.ClrSysMmbId.ClrSysId.Cd
+				agt.FiiClearingSystemIdProprietary = agent.FinInstnId.ClrSysMmbId.ClrSysId.Prtry
+			}
+		}
+
+		if agent.FinInstnId.Othr != nil {
+			agt.FiiOtherId = agent.FinInstnId.Othr.Id
+			agt.FiiOtherIssuer = agent.FinInstnId.Othr.Issr
+
+			if agent.FinInstnId.Othr.SchmeNm != nil {
+				agt.FiiOtherSchemeNameCode = agent.FinInstnId.Othr.SchmeNm.Cd
+				agt.FiiOtherSchemeNameProprietary = agent.FinInstnId.Othr.SchmeNm.Prtry
+			}
+		}
 	}
+
+	if agent.BrnchId != nil {
+		agt.BiId = agent.BrnchId.Id
+		agt.BiLei = agent.BrnchId.LEI
+		agt.BiName = agent.BrnchId.Nm
+		agt.BiPostalAddress = mapPostalAddress(agent.BrnchId.PstlAdr)
+	}
+
+	return &agt
 }
 
 func mapIsoParty(pty *isomodels.Party) *models.Party {
@@ -131,21 +164,22 @@ func mapIsoParty(pty *isomodels.Party) *models.Party {
 		ContactDetails:     mapContactDetails(pty.CtctDtls),
 	}
 
-	if pty.Id.OrgId != nil {
-		party.OrgIdAnyBic = pty.Id.OrgId.AnyBIC
-		party.OrgIdLei = pty.Id.OrgId.LEI
-		party.OrgIdOther = mapOrgIdOther(pty.Id.OrgId.Othr)
-
-	}
-
-	if pty.Id.PrvtId != nil {
-		if pty.Id.PrvtId.DtAndPlcOfBirth != nil {
-			party.PrivateIdBirthDate = pty.Id.PrvtId.DtAndPlcOfBirth.BirthDt
-			party.PrivateIdCityOfBirth = pty.Id.PrvtId.DtAndPlcOfBirth.CityOfBirth
-			party.PrivateIdCountryOfBirth = pty.Id.PrvtId.DtAndPlcOfBirth.CtryOfBirth
-			party.PrivateIdProvinceOfBirth = pty.Id.PrvtId.DtAndPlcOfBirth.PrvcOfBirth
+	if pty.Id != nil {
+		if pty.Id.OrgId != nil {
+			party.OrgIdAnyBic = pty.Id.OrgId.AnyBIC
+			party.OrgIdLei = pty.Id.OrgId.LEI
+			party.OrgIdOther = mapOrgIdOther(pty.Id.OrgId.Othr)
 		}
-		party.PrivateIdOther = mapPrvtIdOther(pty.Id.PrvtId.Othr)
+
+		if pty.Id.PrvtId != nil {
+			if pty.Id.PrvtId.DtAndPlcOfBirth != nil {
+				party.PrivateIdBirthDate = pty.Id.PrvtId.DtAndPlcOfBirth.BirthDt
+				party.PrivateIdCityOfBirth = pty.Id.PrvtId.DtAndPlcOfBirth.CityOfBirth
+				party.PrivateIdCountryOfBirth = pty.Id.PrvtId.DtAndPlcOfBirth.CtryOfBirth
+				party.PrivateIdProvinceOfBirth = pty.Id.PrvtId.DtAndPlcOfBirth.PrvcOfBirth
+			}
+			party.PrivateIdOther = mapPrvtIdOther(pty.Id.PrvtId.Othr)
+		}
 	}
 
 	return &party
@@ -155,17 +189,27 @@ func mapIsoAccount(account *isomodels.Account) *models.Account {
 	if account == nil {
 		return nil
 	}
+
 	acct := models.Account{
-		Iban:            account.Id.IBAN,
-		TypeCode:        account.Tp.Cd,
-		TypeProprietary: account.Tp.Prtry,
-		Currency:        account.Ccy,
-		Name:            account.Nm,
-		ProxyType:       account.Prxy.Tp,
-		ProxyId:         account.Prxy.Id,
+		Currency: account.Ccy,
+		Name:     account.Nm,
 	}
 
-	if account.Id.Othr != nil {
+	if account.Id != nil {
+		acct.Iban = account.Id.IBAN
+	}
+
+	if account.Tp != nil {
+		acct.TypeCode = account.Tp.Cd
+		acct.TypeProprietary = account.Tp.Prtry
+	}
+
+	if account.Prxy != nil {
+		acct.ProxyId = account.Prxy.Id
+		acct.ProxyType = account.Prxy.Tp
+	}
+
+	if account.Id != nil && account.Id.Othr != nil {
 		acct.OtherId = account.Id.Othr.Id
 		acct.OtherIssuer = account.Id.Othr.Issr
 		if account.Id.Othr.SchmeNm != nil {
@@ -178,6 +222,10 @@ func mapIsoAccount(account *isomodels.Account) *models.Account {
 }
 
 func mapOrgIdOther(orgIdOthr []*isomodels.OrgIdOthr) []*models.OrgIdOthr {
+	if len(orgIdOthr) < 1 {
+		return nil
+	}
+
 	var orgIdOthers []*models.OrgIdOthr
 
 	for _, org := range orgIdOthr {
@@ -197,6 +245,10 @@ func mapOrgIdOther(orgIdOthr []*isomodels.OrgIdOthr) []*models.OrgIdOthr {
 }
 
 func mapPrvtIdOther(prvtIdOthr []*isomodels.PrvtIdOthr) []*models.PrivateIdOthr {
+	if len(prvtIdOthr) < 1 {
+		return nil
+	}
+
 	var prvtIdOthers []*models.PrivateIdOthr
 
 	for _, pvt := range prvtIdOthr {
@@ -216,6 +268,9 @@ func mapPrvtIdOther(prvtIdOthr []*isomodels.PrvtIdOthr) []*models.PrivateIdOthr 
 }
 
 func mapContactDetails(ctctDtls *isomodels.CtctDtls) *models.ContactDetails {
+	if ctctDtls == nil {
+		return nil
+	}
 	return &models.ContactDetails{
 		NamePrefix:      ctctDtls.NmPrfx,
 		Name:            ctctDtls.Nm,
@@ -247,6 +302,10 @@ func mapContactOther(contactOthr []*isomodels.ContactOthr) []*models.ContactOthr
 }
 
 func mapPostalAddress(pstlAdr *isomodels.PstlAdr) *models.PostalAddress {
+	if pstlAdr == nil {
+		return nil
+	}
+
 	pa := models.PostalAddress{
 		CareOf:             pstlAdr.CareOf,
 		Department:         pstlAdr.Dept,

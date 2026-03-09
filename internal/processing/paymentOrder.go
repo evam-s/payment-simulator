@@ -9,6 +9,8 @@ import (
 	"payment-simulator/internal/models"
 	"strconv"
 	"time"
+
+	"go.mongodb.org/mongo-driver/bson"
 )
 
 var duplicateTxnTtl time.Duration = 0
@@ -53,4 +55,12 @@ func createPaymentOrder(po *models.PaymentOrder) error {
 		log.Println("Payment Order Entry Created. Id:", res.InsertedID)
 		return nil
 	}
+}
+
+func updatePaymentOrder(po *models.PaymentOrder) error {
+	if res, err := db.DB.Collection("PaymentOrders").UpdateOne(ctx, bson.M{"entityid": po.EntityId}, bson.M{"$set": po}); true {
+		log.Println("PaymentOrders UpdateOne res", res)
+		log.Println("PaymentOrders UpdateOne err", err)
+	}
+	return nil
 }

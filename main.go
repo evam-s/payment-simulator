@@ -6,6 +6,7 @@ import (
 	"payment-simulator/internal/config"
 	"payment-simulator/internal/db"
 	"payment-simulator/internal/folderwatcher"
+	"payment-simulator/internal/processing"
 	"payment-simulator/internal/routing/incoming"
 	_ "payment-simulator/internal/uploads"
 	"payment-simulator/internal/validation"
@@ -28,6 +29,7 @@ func main() {
 	fw.InitializeFolderWatcher()
 	validation.RegisterCustomValidations()
 	router := routing.RoutingSetup()
+	processing.SetPacs002CB(config.Pacs002CBURL)
 
 	log.Println("Payments App Started on Port:", config.ServicePort)
 	router.Run(":" + config.ServicePort)
