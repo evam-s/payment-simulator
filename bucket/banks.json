@@ -1,0 +1,692 @@
+[
+	{
+		"id": "B001",
+		"name": "Springfield National Bank",
+		"bic": "SPNBUS33XXX",
+		"country": "US",
+		"active": true,
+		"balance": 128945672,
+		"branches": [
+			{
+				"id": "BR001",
+				"name": "Main Branch",
+				"phoneNumber": "+1-202-555-2001",
+				"address": {
+					"streetName": "Main Street",
+					"buildingNumber": "1",
+					"townName": "Springfield",
+					"postalCode": "62701",
+					"country": "US",
+					"floor": "1",
+					"unitNumber": "A",
+					"department": "Retail Banking",
+					"subDepartment": "North",
+					"careOf": "Branch Manager",
+					"addressLine": "1 Main Street, Springfield, US 62701"
+				}
+			},
+			{
+				"id": "BR001A",
+				"name": "Westside Branch",
+				"phoneNumber": "+1-202-555-2101",
+				"address": {
+					"streetName": "Oak Avenue",
+					"buildingNumber": "45",
+					"townName": "Springfield",
+					"postalCode": "62711",
+					"country": "US",
+					"floor": "2",
+					"unitNumber": "B",
+					"department": "Retail Banking",
+					"subDepartment": "West",
+					"careOf": "Branch Supervisor",
+					"addressLine": "45 Oak Avenue, Springfield, US 62711"
+				}
+			}
+		]
+	},
+	{
+		"id": "B002",
+		"name": "Global Trust Bank",
+		"bic": "GTBKGB2LXXX",
+		"country": "UK",
+		"active": true,
+		"balance": 2503118990,
+		"branches": [
+			{
+				"id": "BR002",
+				"name": "London HQ",
+				"phoneNumber": "+44-20-555-2002",
+				"address": {
+					"streetName": "Fleet Street",
+					"buildingNumber": "22",
+					"townName": "London",
+					"postalCode": "EC4A 2BB",
+					"country": "UK",
+					"floor": "5",
+					"unitNumber": "B",
+					"department": "Corporate Banking",
+					"subDepartment": "West",
+					"careOf": "Branch Director",
+					"addressLine": "22 Fleet Street, London, UK EC4A 2BB"
+				}
+			},
+			{
+				"id": "BR002A",
+				"name": "Manchester Branch",
+				"phoneNumber": "+44-161-555-2202",
+				"address": {
+					"streetName": "King Street",
+					"buildingNumber": "100",
+					"townName": "Manchester",
+					"postalCode": "M2 4WU",
+					"country": "UK",
+					"floor": "3",
+					"unitNumber": "C",
+					"department": "Retail Banking",
+					"subDepartment": "North",
+					"careOf": "Branch Supervisor",
+					"addressLine": "100 King Street, Manchester, UK M2 4WU"
+				}
+			}
+		]
+	},
+	{
+		"id": "B003",
+		"name": "Pacific Commercial Bank",
+		"bic": "PCBKJPJTXXX",
+		"country": "JP",
+		"active": true,
+		"balance": 875432119,
+		"branches": [
+			{
+				"id": "BR003",
+				"name": "Tokyo Central",
+				"phoneNumber": "+81-3-5555-2003",
+				"address": {
+					"streetName": "Shinjuku Avenue",
+					"buildingNumber": "101",
+					"townName": "Tokyo",
+					"postalCode": "160-0022",
+					"country": "JP",
+					"floor": "12",
+					"unitNumber": "C",
+					"department": "International Banking",
+					"subDepartment": "East",
+					"careOf": "Branch Manager",
+					"addressLine": "101 Shinjuku Avenue, Tokyo, JP 160-0022"
+				}
+			},
+			{
+				"id": "BR003A",
+				"name": "Osaka Branch",
+				"phoneNumber": "+81-6-5555-2103",
+				"address": {
+					"streetName": "Namba Street",
+					"buildingNumber": "77",
+					"townName": "Osaka",
+					"postalCode": "542-0076",
+					"country": "JP",
+					"floor": "6",
+					"unitNumber": "D",
+					"department": "Retail Banking",
+					"subDepartment": "West",
+					"careOf": "Branch Supervisor",
+					"addressLine": "77 Namba Street, Osaka, JP 542-0076"
+				}
+			}
+		]
+	},
+	{
+		"id": "B004",
+		"name": "Continental Finance Bank",
+		"bic": "CFBKDEFFXXX",
+		"country": "DE",
+		"active": true,
+		"balance": 45678901,
+		"branches": [
+			{
+				"id": "BR004",
+				"name": "Berlin HQ",
+				"phoneNumber": "+49-30-555-2004",
+				"address": {
+					"streetName": "Unter den Linden",
+					"buildingNumber": "10",
+					"townName": "Berlin",
+					"postalCode": "10117",
+					"country": "DE",
+					"floor": "3",
+					"unitNumber": "D",
+					"department": "Retail Banking",
+					"subDepartment": "Central",
+					"careOf": "Branch Director",
+					"addressLine": "10 Unter den Linden, Berlin, DE 10117"
+				}
+			},
+			{
+				"id": "BR004A",
+				"name": "Munich Branch",
+				"phoneNumber": "+49-89-555-2104",
+				"address": {
+					"streetName": "Maximilianstrasse",
+					"buildingNumber": "25",
+					"townName": "Munich",
+					"postalCode": "80539",
+					"country": "DE",
+					"floor": "2",
+					"unitNumber": "E",
+					"department": "Corporate Banking",
+					"subDepartment": "South",
+					"careOf": "Branch Supervisor",
+					"addressLine": "25 Maximilianstrasse, Munich, DE 80539"
+				}
+			}
+		]
+	},
+	{
+		"id": "B005",
+		"name": "Eastern Savings Bank",
+		"bic": "ESBKINBBXXX",
+		"country": "IN",
+		"active": true,
+		"balance": 9876543210,
+		"branches": [
+			{
+				"id": "BR005",
+				"name": "Mumbai HQ",
+				"phoneNumber": "+91-22-555-2005",
+				"address": {
+					"streetName": "Marine Drive",
+					"buildingNumber": "55",
+					"townName": "Mumbai",
+					"postalCode": "400020",
+					"country": "IN",
+					"floor": "7",
+					"unitNumber": "E",
+					"department": "Corporate Banking",
+					"subDepartment": "West",
+					"careOf": "Branch Manager",
+					"addressLine": "55 Marine Drive, Mumbai, IN 400020"
+				}
+			},
+			{
+				"id": "BR005A",
+				"name": "Delhi Branch",
+				"phoneNumber": "+91-11-555-2105",
+				"address": {
+					"streetName": "Connaught Place",
+					"buildingNumber": "12",
+					"townName": "New Delhi",
+					"postalCode": "110001",
+					"country": "IN",
+					"floor": "4",
+					"unitNumber": "F",
+					"department": "Retail Banking",
+					"subDepartment": "North",
+					"careOf": "Branch Supervisor",
+					"addressLine": "12 Connaught Place, New Delhi, IN 110001"
+				}
+			}
+		]
+	},
+	{
+		"id": "B006",
+		"name": "Northern Credit Union",
+		"bic": "NCUBCA6SXXX",
+		"country": "CA",
+		"active": true,
+		"balance": 3456789654,
+		"branches": [
+			{
+				"id": "BR006",
+				"name": "Toronto HQ",
+				"phoneNumber": "+1-416-555-2006",
+				"address": {
+					"streetName": "Bay Street",
+					"buildingNumber": "200",
+					"townName": "Toronto",
+					"postalCode": "M5J 2N8",
+					"country": "CA",
+					"floor": "15",
+					"unitNumber": "F",
+					"department": "Retail Banking",
+					"subDepartment": "North",
+					"careOf": "Branch Director",
+					"addressLine": "200 Bay Street, Toronto, CA M5J 2N8"
+				}
+			},
+			{
+				"id": "BR006A",
+				"name": "Vancouver Branch",
+				"phoneNumber": "+1-604-555-2106",
+				"address": {
+					"streetName": "Granville Street",
+					"buildingNumber": "88",
+					"townName": "Vancouver",
+					"postalCode": "V6Z 1K7",
+					"country": "CA",
+					"floor": "6",
+					"unitNumber": "G",
+					"department": "Corporate Banking",
+					"subDepartment": "West",
+					"careOf": "Branch Supervisor",
+					"addressLine": "88 Granville Street, Vancouver, CA V6Z 1K7"
+				}
+			}
+		]
+	},
+	{
+		"id": "B007",
+		"name": "Southern Capital Bank",
+		"bic": "SCBKUS44XXX",
+		"country": "US",
+		"active": true,
+		"balance": 712345678,
+		"branches": [
+			{
+				"id": "BR007",
+				"name": "Atlanta HQ",
+				"phoneNumber": "+1-404-555-2007",
+				"address": {
+					"streetName": "Peachtree Street",
+					"buildingNumber": "300",
+					"townName": "Atlanta",
+					"postalCode": "30303",
+					"country": "US",
+					"floor": "8",
+					"unitNumber": "G",
+					"department": "Corporate Banking",
+					"subDepartment": "South",
+					"careOf": "Branch Manager",
+					"addressLine": "300 Peachtree Street, Atlanta, US 30303"
+				}
+			},
+			{
+				"id": "BR007A",
+				"name": "Miami Branch",
+				"phoneNumber": "+1-305-555-2107",
+				"address": {
+					"streetName": "Brickell Avenue",
+					"buildingNumber": "120",
+					"townName": "Miami",
+					"postalCode": "33131",
+					"country": "US",
+					"floor": "10",
+					"unitNumber": "H",
+					"department": "Retail Banking",
+					"subDepartment": "East",
+					"careOf": "Branch Supervisor",
+					"addressLine": "120 Brickell Avenue, Miami, US 33131"
+				}
+			}
+		]
+	},
+	{
+		"id": "B008",
+		"name": "Western Trust Bank",
+		"bic": "WTBKAU2SXXX",
+		"country": "AU",
+		"active": true,
+		"balance": 6543210987,
+		"branches": [
+			{
+				"id": "BR008",
+				"name": "Sydney HQ",
+				"phoneNumber": "+61-2-555-2008",
+				"address": {
+					"streetName": "George Street",
+					"buildingNumber": "400",
+					"townName": "Sydney",
+					"postalCode": "2000",
+					"country": "AU",
+					"floor": "9",
+					"unitNumber": "H",
+					"department": "Retail Banking",
+					"subDepartment": "East",
+					"careOf": "Branch Director",
+					"addressLine": "400 George Street, Sydney, AU 2000"
+				}
+			},
+			{
+				"id": "BR008A",
+				"name": "Melbourne Branch",
+				"phoneNumber": "+61-3-555-2108",
+				"address": {
+					"streetName": "Collins Street",
+					"buildingNumber": "250",
+					"townName": "Melbourne",
+					"postalCode": "3000",
+					"country": "AU",
+					"floor": "5",
+					"unitNumber": "I",
+					"department": "Corporate Banking",
+					"subDepartment": "South",
+					"careOf": "Branch Supervisor",
+					"addressLine": "250 Collins Street, Melbourne, AU 3000"
+				}
+			}
+		]
+	},
+	{
+		"id": "B009",
+		"name": "Central Bank of Europe",
+		"bic": "CBEKFRPPXXX",
+		"country": "FR",
+		"active": true,
+		"balance": 1234567890,
+		"branches": [
+			{
+				"id": "BR009",
+				"name": "Paris HQ",
+				"phoneNumber": "+33-1-555-2009",
+				"address": {
+					"streetName": "Champs-Élysées",
+					"buildingNumber": "75",
+					"townName": "Paris",
+					"postalCode": "75008",
+					"country": "FR",
+					"floor": "10",
+					"unitNumber": "I",
+					"department": "International Banking",
+					"subDepartment": "West",
+					"careOf": "Branch Director",
+					"addressLine": "75 Champs-Élysées, Paris, FR 75008"
+				}
+			},
+			{
+				"id": "BR009A",
+				"name": "Lyon Branch",
+				"phoneNumber": "+33-4-555-2109",
+				"address": {
+					"streetName": "Rue de la République",
+					"buildingNumber": "20",
+					"townName": "Lyon",
+					"postalCode": "69002",
+					"country": "FR",
+					"floor": "3",
+					"unitNumber": "J",
+					"department": "Retail Banking",
+					"subDepartment": "South",
+					"careOf": "Branch Supervisor",
+					"addressLine": "20 Rue de la République, Lyon, FR 69002"
+				}
+			}
+		]
+	},
+	{
+		"id": "B010",
+		"name": "Metropolitan Bank",
+		"bic": "MTBKUS33XXX",
+		"country": "US",
+		"active": true,
+		"balance": 4321098765,
+		"branches": [
+			{
+				"id": "BR010",
+				"name": "New York HQ",
+				"phoneNumber": "+1-212-555-2010",
+				"address": {
+					"streetName": "Wall Street",
+					"buildingNumber": "50",
+					"townName": "New York",
+					"postalCode": "10005",
+					"country": "US",
+					"floor": "20",
+					"unitNumber": "J",
+					"department": "Corporate Banking",
+					"subDepartment": "East",
+					"careOf": "Branch Director",
+					"addressLine": "50 Wall Street, New York, US 10005"
+				}
+			},
+			{
+				"id": "BR010A",
+				"name": "Chicago Branch",
+				"phoneNumber": "+1-312-555-2110",
+				"address": {
+					"streetName": "LaSalle Street",
+					"buildingNumber": "200",
+					"townName": "Chicago",
+					"postalCode": "60604",
+					"country": "US",
+					"floor": "12",
+					"unitNumber": "K",
+					"department": "Retail Banking",
+					"subDepartment": "Midwest",
+					"careOf": "Branch Supervisor",
+					"addressLine": "200 LaSalle Street, Chicago, US 60604"
+				}
+			}
+		]
+	},
+	{
+		"id": "B011",
+		"name": "Transcontinental Bank",
+		"bic": "TCBKSGSGXXX",
+		"country": "SG",
+		"active": true,
+		"balance": 987654321,
+		"branches": [
+			{
+				"id": "BR011",
+				"name": "Singapore HQ",
+				"phoneNumber": "+65-555-2011",
+				"address": {
+					"streetName": "Raffles Place",
+					"buildingNumber": "1",
+					"townName": "Singapore",
+					"postalCode": "048616",
+					"country": "SG",
+					"floor": "25",
+					"unitNumber": "K",
+					"department": "Corporate Banking",
+					"subDepartment": "East",
+					"careOf": "Branch Director",
+					"addressLine": "1 Raffles Place, Singapore 048616"
+				}
+			},
+			{
+				"id": "BR011A",
+				"name": "Jurong Branch",
+				"phoneNumber": "+65-555-2111",
+				"address": {
+					"streetName": "Jurong Gateway Road",
+					"buildingNumber": "50",
+					"townName": "Singapore",
+					"postalCode": "608549",
+					"country": "SG",
+					"floor": "8",
+					"unitNumber": "L",
+					"department": "Retail Banking",
+					"subDepartment": "West",
+					"careOf": "Branch Supervisor",
+					"addressLine": "50 Jurong Gateway Road, Singapore 608549"
+				}
+			}
+		]
+	},
+	{
+		"id": "B012",
+		"name": "Nordic Investment Bank",
+		"bic": "NIBKFIHHXXX",
+		"country": "FI",
+		"active": true,
+		"balance": 5678901234,
+		"branches": [
+			{
+				"id": "BR012",
+				"name": "Helsinki HQ",
+				"phoneNumber": "+358-9-555-2012",
+				"address": {
+					"streetName": "Unioninkatu",
+					"buildingNumber": "32",
+					"townName": "Helsinki",
+					"postalCode": "00170",
+					"country": "FI",
+					"floor": "4",
+					"unitNumber": "L",
+					"department": "Investment Banking",
+					"subDepartment": "North",
+					"careOf": "Branch Director",
+					"addressLine": "32 Unioninkatu, Helsinki, FI 00170"
+				}
+			},
+			{
+				"id": "BR012A",
+				"name": "Turku Branch",
+				"phoneNumber": "+358-2-555-2112",
+				"address": {
+					"streetName": "Aurakatu",
+					"buildingNumber": "15",
+					"townName": "Turku",
+					"postalCode": "20100",
+					"country": "FI",
+					"floor": "2",
+					"unitNumber": "M",
+					"department": "Retail Banking",
+					"subDepartment": "West",
+					"careOf": "Branch Supervisor",
+					"addressLine": "15 Aurakatu, Turku, FI 20100"
+				}
+			}
+		]
+	},
+	{
+		"id": "B013",
+		"name": "Mediterranean Bank",
+		"bic": "MDBKITMMXXX",
+		"country": "IT",
+		"active": true,
+		"balance": 8901234567,
+		"branches": [
+			{
+				"id": "BR013",
+				"name": "Rome HQ",
+				"phoneNumber": "+39-06-555-2013",
+				"address": {
+					"streetName": "Via del Corso",
+					"buildingNumber": "88",
+					"townName": "Rome",
+					"postalCode": "00186",
+					"country": "IT",
+					"floor": "6",
+					"unitNumber": "M",
+					"department": "Retail Banking",
+					"subDepartment": "South",
+					"careOf": "Branch Director",
+					"addressLine": "88 Via del Corso, Rome, IT 00186"
+				}
+			},
+			{
+				"id": "BR013A",
+				"name": "Milan Branch",
+				"phoneNumber": "+39-02-555-2113",
+				"address": {
+					"streetName": "Corso Buenos Aires",
+					"buildingNumber": "120",
+					"townName": "Milan",
+					"postalCode": "20124",
+					"country": "IT",
+					"floor": "5",
+					"unitNumber": "N",
+					"department": "Corporate Banking",
+					"subDepartment": "North",
+					"careOf": "Branch Supervisor",
+					"addressLine": "120 Corso Buenos Aires, Milan, IT 20124"
+				}
+			}
+		]
+	},
+	{
+		"id": "B014",
+		"name": "Arabian Gulf Bank",
+		"bic": "AGBKAEADXXX",
+		"country": "AE",
+		"active": true,
+		"balance": 2468013579,
+		"branches": [
+			{
+				"id": "BR014",
+				"name": "Dubai HQ",
+				"phoneNumber": "+971-4-555-2014",
+				"address": {
+					"streetName": "Sheikh Zayed Road",
+					"buildingNumber": "500",
+					"townName": "Dubai",
+					"postalCode": "00000",
+					"country": "AE",
+					"floor": "15",
+					"unitNumber": "N",
+					"department": "Corporate Banking",
+					"subDepartment": "Central",
+					"careOf": "Branch Director",
+					"addressLine": "500 Sheikh Zayed Road, Dubai, AE"
+				}
+			},
+			{
+				"id": "BR014A",
+				"name": "Abu Dhabi Branch",
+				"phoneNumber": "+971-2-555-2114",
+				"address": {
+					"streetName": "Corniche Road",
+					"buildingNumber": "75",
+					"townName": "Abu Dhabi",
+					"postalCode": "00000",
+					"country": "AE",
+					"floor": "8",
+					"unitNumber": "O",
+					"department": "Retail Banking",
+					"subDepartment": "West",
+					"careOf": "Branch Supervisor",
+					"addressLine": "75 Corniche Road, Abu Dhabi, AE"
+				}
+			}
+		]
+	},
+	{
+		"id": "B015",
+		"name": "Andean Development Bank",
+		"bic": "ADBKPEPLXXX",
+		"country": "PE",
+		"active": true,
+		"balance": 7654321098,
+		"branches": [
+			{
+				"id": "BR015",
+				"name": "Lima HQ",
+				"phoneNumber": "+51-1-555-2015",
+				"address": {
+					"streetName": "Avenida Arequipa",
+					"buildingNumber": "1500",
+					"townName": "Lima",
+					"postalCode": "15046",
+					"country": "PE",
+					"floor": "10",
+					"unitNumber": "O",
+					"department": "Development Banking",
+					"subDepartment": "West",
+					"careOf": "Branch Director",
+					"addressLine": "1500 Avenida Arequipa, Lima, PE 15046"
+				}
+			},
+			{
+				"id": "BR015A",
+				"name": "Cusco Branch",
+				"phoneNumber": "+51-84-555-2115",
+				"address": {
+					"streetName": "Avenida El Sol",
+					"buildingNumber": "200",
+					"townName": "Cusco",
+					"postalCode": "08002",
+					"country": "PE",
+					"floor": "3",
+					"unitNumber": "P",
+					"department": "Retail Banking",
+					"subDepartment": "South",
+					"careOf": "Branch Supervisor",
+					"addressLine": "200 Avenida El Sol, Cusco, PE 08002"
+				}
+			}
+		]
+	}
+]
