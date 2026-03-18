@@ -188,7 +188,7 @@ func CreatePacs002ForSinglePo(po *models.PaymentOrder, status string) error {
 					ReqId:       po.Id,
 					EntityId:    po.EntityId,
 					EventId:     "PACS002" + status,
-					EventRemark: "PACS002 " + status + " Sent Out, MsgId:" + pacs002Id + ", StsId:" + stsIdMap[po.TransactionId],
+					EventRemark: "PACS002 " + status + " Sent Out, MsgId: " + pacs002Id + ", StsId: " + stsIdMap[po.TransactionId],
 				})
 			}
 			return nil

@@ -15,8 +15,7 @@ func SetPacs002CB(url string) {
 	Pacs002CallbackUrl = url
 }
 
-func ProcessInboundPo(isoPacs *isomodels.Pacs008, id, callBackUrl string) error {
-	Pacs002CallbackUrl = callBackUrl
+func ProcessInboundPo(isoPacs *isomodels.Pacs008, id string) error {
 	if err, po := mapping.MapPacs008ToPo(isoPacs); err != nil {
 		log.Println("There was some error in mapping PO", po.EntityId, "to internal structures:", err)
 		return fmt.Errorf("Failed to bind XML: %w", err)

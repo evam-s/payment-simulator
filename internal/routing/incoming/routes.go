@@ -9,6 +9,7 @@ import (
 	"payment-simulator/internal/db"
 	"payment-simulator/internal/mapping"
 	"payment-simulator/internal/processing"
+	"payment-simulator/internal/routing/graphql"
 	"strings"
 	"time"
 
@@ -19,6 +20,7 @@ import (
 
 func RoutingSetup() *gin.Engine {
 	router := gin.Default()
+	router.Use(CORSMiddleware())
 	router.GET("/health", func(c *gin.Context) {
 		c.JSON(200, gin.H{"status": "ok"})
 	})
@@ -68,7 +70,7 @@ func RoutingSetup() *gin.Engine {
 			update := bson.M{"$set": bson.M{"transformedXml": isoPacs, "actualType": strings.Split(isoPacs.Xmlns, "xsd:")[1]}}
 			db.DB.Collection("MessageLogger").UpdateByID(ctx1, id, update)
 
-			if err := processing.ProcessInboundPo(isoPacs, id, headers.Get("X-TESTING-CALLBACK-URL")); err != nil {
+			if err := processing.ProcessInboundPo(isoPacs, id); err != nil {
 				if strings.HasPrefix(err.Error(), "Failed to bind XML") {
 					c.JSON(400, gin.H{"ErrorMessage": err})
 				} else {
@@ -80,5 +82,21 @@ func RoutingSetup() *gin.Engine {
 			}
 		}
 	})
+	graphql.GraphQlSetup(router)
 	return router
+}
+
+func CORSMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
+		c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+		c.Writer.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
+
+		if c.Request.Method == "OPTIONS" {
+			c.AbortWithStatus(204)
+			return
+		}
+
+		c.Next()
+	}
 }
