@@ -1,0 +1,96 @@
+# GraphQL schema example
+#
+# https://gqlgen.com/getting-started/
+
+# type Todo {
+#   id: ID!
+#   text: String!
+#   done: Boolean!
+#   user: User!
+# }
+
+# type User {
+#   id: ID!
+#   name: String!
+# }
+
+# type Query {
+#   todos: [Todo!]!
+# }
+
+# input NewTodo {
+#   text: String!
+#   userId: String!
+# }
+
+# type Mutation {
+#   createTodo(input: NewTodo!): Todo!
+# }
+
+scalar DateTime
+
+type Account {
+  Id: String
+  Name: String
+  PhoneNumber: String
+  Email: String
+  Currency: String
+  Balance: Int
+  Active: Boolean
+  Address: AccountAddress
+}
+
+type AccountAddress {
+  Type: String
+  CareOf: String
+  Department: String
+  SubDepartment: String
+  StreetName: String
+  BuildingNumber: String
+  BuildingName: String
+  Floor: String
+  UnitNumber: String
+  PostBox: String
+  Room: String
+  PostalCode: String
+  TownName: String
+  TownLocationName: String
+  DistrictName: String
+  CountrySubdivision: String
+  Country: String
+  AddressLine: String
+}
+
+type Bank {
+  Id: String
+  Name: String
+  BIC: String
+  Country: String
+  Balance: Int
+  Active: Boolean
+  Branches: [Branch]
+}
+
+type Branch {
+  Id: String
+  Name: String
+  PhoneNumber: String
+  Address: AccountAddress
+}
+
+type EventLog {
+  Id: String
+  ReqId: String
+  EntityId: String
+  EventDate: DateTime
+  EventId: String
+  EventRemark: String
+  AdditionalInfo: String
+  Errors: [String]
+}
+
+type Query {
+  accounts: [Account]
+  eventlog(EntityId: String!): [EventLog]
+  banks: [Bank]
+}

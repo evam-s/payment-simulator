@@ -7,6 +7,7 @@ import (
 	"payment-simulator/internal/db"
 	"payment-simulator/internal/folderwatcher"
 	"payment-simulator/internal/processing"
+	_ "payment-simulator/internal/routing/graphql"
 	"payment-simulator/internal/routing/incoming"
 	_ "payment-simulator/internal/uploads"
 	"payment-simulator/internal/validation"

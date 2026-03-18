@@ -12,7 +12,7 @@ func GetKafkaController() (*kafka.Conn, error) {
 		brokerConn, err := kafka.Dial("tcp", broker)
 		if err != nil {
 			log.Println("Error in Connecting to Broker ", broker, ", Error:", err)
-			brokerConn.Close()
+			// brokerConn.Close()
 			continue
 		}
 
@@ -32,7 +32,5 @@ func GetKafkaController() (*kafka.Conn, error) {
 
 		return cont, nil // Controller connection must be closed by called func.
 	}
-
-	return nil, fmt.Errorf("Unable to connect to any of the provided Brokers.")
+	panic(fmt.Errorf("Unable to connect to any of the provided Brokers."))
 }
-
